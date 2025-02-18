@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import {
 	pgEnum,
 	pgTable,
@@ -7,7 +8,8 @@ import {
 	integer,
 	date,
 	numeric,
-	jsonb,
+	boolean,
+	check,
 } from 'drizzle-orm/pg-core';
 
 // Common timestamps for all tables
@@ -17,20 +19,18 @@ const timestamps = {
 	deleted_at: timestamp(),
 };
 
-// Enums
-const membershipStatusEnum = pgEnum('membership_status', ['active', 'cancelled', 'overdue']);
-const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'inactive', 'overdue']);
-const purchaseStatusEnum = pgEnum('purchase_status', [
-	'pending',
-	'completed',
-	'failed',
-	'refunded',
-]);
-const purchaseItemEnum = pgEnum('purchase_item', [
-	'membership',
-	'single_wash',
-	'subscription',
-	'coupon',
+// Option Enums
+const vehicleColorEnum = pgEnum('vehicle_color', [
+	'black',
+	'blue',
+	'bronze',
+	'gold',
+	'gray',
+	'green',
+	'red',
+	'silver',
+	'white',
+	'yellow',
 ]);
 
 /**
@@ -42,79 +42,183 @@ export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
-	phone: text('phone'),
-	membership_status: membershipStatusEnum('membership_status').default('active'),
+	phone: text('phone').notNull(),
+	address: text('address').notNull(),
+	account_status: pgEnum('account_status', ['active', 'cancelled'])('account_status')
+		.notNull()
+		.default('active'),
+	cancelled_at: timestamp('cancelled_at'),
+	cancelled_by: text('cancelled_by').notNull().default('system'),
+	cancelled_reason: text('cancelled_reason'),
 	...timestamps,
 });
 
 // Vehicles table
 export const vehicles = pgTable('vehicles', {
 	id: serial('id').primaryKey(),
-	user_id: serial('user_id').references(() => users.id),
+	user_id: serial('user_id')
+		.notNull()
+		.references(() => users.id),
 	make: text('make').notNull(),
 	model: text('model').notNull(),
+	color: vehicleColorEnum('color').notNull(),
 	year: integer('year').notNull(),
 	license_plate: text('license_plate').notNull(),
 	...timestamps,
 });
 
-// Vehicle Subscriptions table
-export const vehicleSubscriptions = pgTable('vehicle_subscriptions', {
+// Subscription Plans table
+
+export const subscriptionPlans = pgTable('subscription_plans', {
 	id: serial('id').primaryKey(),
-	user_id: serial('user_id').references(() => users.id),
-	vehicle_id: serial('vehicle_id').references(() => vehicles.id),
-	status: subscriptionStatusEnum('subscription_status').notNull(),
-	start_date: date('start_date').notNull(),
-	end_date: date('end_date').notNull(),
+	plan: pgEnum('subscription_plan', ['bronze', 'silver', 'gold', 'platinum'])(
+		'subscription_plan'
+	).notNull(),
+	description: text('description').notNull(),
+	price: numeric('price', { precision: 10, scale: 2 }).notNull(),
+	washes_per_month: integer('washes_per_month').notNull(),
+	is_active: boolean('is_active').notNull().default(true),
 	...timestamps,
 });
 
-// Subscription Transfers table
+// Subscriptions
+
+const subscriptionStatusEnum = pgEnum('subscription_status', [
+	'active',
+	'inactive',
+	'overdue',
+	'transferred',
+]);
+
+export const subscriptions = pgTable('subscriptions', {
+	id: serial('id').primaryKey(),
+	user_id: integer('user_id')
+		.notNull()
+		.references(() => users.id),
+	vehicle_id: integer('vehicle_id')
+		.notNull()
+		.references(() => vehicles.id)
+		.unique(),
+	plan_id: integer('plan_id')
+		.notNull()
+		.references(() => subscriptionPlans.id),
+	remaining_washes: integer('remaining_washes').notNull(),
+	subscription_status: subscriptionStatusEnum('subscription_status').notNull().default('active'),
+
+	start_date: date('start_date').notNull(),
+	end_date: date('end_date').notNull(),
+
+	...timestamps,
+});
+
+// Subscription Transfers
 export const subscriptionTransfers = pgTable('subscription_transfers', {
 	id: serial('id').primaryKey(),
-	subscription_id: serial('subscription_id').references(() => vehicleSubscriptions.id),
-	from_vehicle_id: serial('from_vehicle_id').references(() => vehicles.id),
-	to_vehicle_id: serial('to_vehicle_id').references(() => vehicles.id),
-	transferred_at: timestamp('transferred_at').notNull(),
-	transferred_by: text('transferred_by').notNull().default('system'), // CSR ID
+	subscription_id: integer('subscription_id')
+		.notNull()
+		.references(() => subscriptions.id),
+	from_vehicle_id: integer('from_vehicle_id')
+		.notNull()
+		.references(() => vehicles.id),
+	to_vehicle_id: integer('to_vehicle_id')
+		.notNull()
+		.references(() => vehicles.id),
+	transferred_at: timestamp('transferred_at').notNull().defaultNow(),
+	transferred_by: text('transferred_by').notNull().default('system'),
+	transfer_reason: text('transfer_reason'),
 	...timestamps,
 });
 
 // Washes table
 export const washes = pgTable('washes', {
 	id: serial('id').primaryKey(),
-	user_id: serial('user_id').references(() => users.id),
-	vehicle_id: serial('vehicle_id').references(() => vehicles.id),
-	purchase_id: serial('purchase_id').references(() => purchases.id),
-	wash_date: date('wash_date').notNull(),
+	user_id: integer('user_id')
+		.notNull()
+		.references(() => users.id),
+	vehicle_id: integer('vehicle_id')
+		.notNull()
+		.references(() => vehicles.id),
+	subscription_id: integer('subscription_id').references(() => subscriptions.id),
 	...timestamps,
 });
 
-// Purchases table
-export const purchases = pgTable('purchases', {
-	id: serial('id').primaryKey(),
-	user_id: serial('user_id').references(() => users.id),
-	purchase_item: purchaseItemEnum('purchase_item').notNull(),
-	original_amount: numeric('original_amount', { precision: 10, scale: 2 }).notNull(),
-	discount_amount: numeric('discount_amount', { precision: 10, scale: 2 }).default('0.00'),
-	total_amount: numeric('total_amount', { precision: 10, scale: 2 }).notNull(),
-	details: jsonb('details').notNull(), // flexible field for notes, etc.
-	status: purchaseStatusEnum('purchase_status').notNull(),
-	coupon_id: serial('coupon_id').references(() => coupons.id),
-	...timestamps,
-});
+/**
+ * Payments
+ */
+
+// Payment Methods Table
+export const paymentMethods = pgTable(
+	'payment_methods',
+	{
+		id: serial('id').primaryKey(),
+		user_id: integer('user_id')
+			.notNull()
+			.references(() => users.id),
+		card_last4: text('card_last4').notNull(),
+		card_exp_month: integer('card_exp_month').notNull(),
+		card_exp_year: integer('card_exp_year').notNull(),
+		is_default: boolean('is_default').notNull().default(false),
+
+		...timestamps,
+	},
+	(table) => [
+		check('card_exp_date_check', sql`card_exp_month >= 1 AND card_exp_month <= 12`),
+		check('card_exp_year_check', sql`card_exp_year >= 2025`),
+	]
+);
+
+// Payments Table
+
+const paymentStatusEnum = pgEnum('payment_status', ['paid', 'failed', 'pending', 'refunded']);
+
+const paymentStatusReasonEnum = pgEnum('payment_status_reason', [
+	'payment_failed',
+	'insufficient_funds',
+	'card_expired',
+	'user_cancelled',
+	'system_error',
+]);
+
+export const payments = pgTable(
+	'payments',
+	{
+		id: serial('id').primaryKey(),
+		user_id: integer('user_id')
+			.notNull()
+			.references(() => users.id),
+		payment_method_id: integer('payment_method_id')
+			.notNull()
+			.references(() => paymentMethods.id),
+		base_amount: numeric('base_amount', { precision: 10, scale: 2 }).notNull(), // amount in dollars
+		discount_amount: numeric('discount_amount', { precision: 10, scale: 2 }).notNull(),
+		final_amount: numeric('final_amount', { precision: 10, scale: 2 }).notNull(),
+		coupon_id: integer('coupon_id').references(() => coupons.id),
+		status: paymentStatusEnum('payment_status').notNull().default('pending'),
+		status_reason: paymentStatusReasonEnum('payment_status_reason'),
+		item_type: pgEnum('payment_item_type', ['subscription', 'wash'])('payment_item_type').notNull(),
+		subscription_id: integer('subscription_id').references(() => subscriptions.id),
+		wash_id: integer('wash_id').references(() => washes.id),
+		...timestamps,
+	},
+	(table) => [
+		// check constraint to ensure payment is associated with either a subscription or a wash
+		check(
+			'item_reference_check',
+			sql`(item_type = 'subscription' AND subscription_id IS NOT NULL) OR
+        (item_type = 'wash' AND wash_id IS NOT NULL)`
+		),
+	]
+);
 
 // Coupons table
+//todo
 export const coupons = pgTable('coupons', {
 	id: serial('id').primaryKey(),
 	code: text('code').notNull(),
 	discount_amount: numeric('discount_amount').notNull(), // amount in dollars
-});
+	is_active: boolean('is_active').notNull().default(true),
+	valid_from: date('valid_from').notNull(),
+	valid_to: date('valid_to').notNull(),
 
-// Coupon Redemptions table
-export const couponRedemptions = pgTable('coupon_redemptions', {
-	id: serial('id').primaryKey(),
-	coupon_id: serial('coupon_id').references(() => coupons.id),
-	redemption_date: date('redemption_date').notNull(),
 	...timestamps,
 });
