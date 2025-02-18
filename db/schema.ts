@@ -19,8 +19,10 @@ const timestamps = {
 	deleted_at: timestamp(),
 };
 
-// Option Enums
-const vehicleColorEnum = pgEnum('vehicle_color', [
+// Enums
+export const accountStatusEnum = pgEnum('account_status', ['active', 'cancelled']);
+
+export const vehicleColorEnum = pgEnum('vehicle_color', [
 	'black',
 	'blue',
 	'bronze',
@@ -33,6 +35,35 @@ const vehicleColorEnum = pgEnum('vehicle_color', [
 	'yellow',
 ]);
 
+export const subscriptionStatusEnum = pgEnum('subscription_status', [
+	'active',
+	'inactive',
+	'overdue',
+	'transferred',
+]);
+
+export const subscriptionPlanEnum = pgEnum('subscription_plan', [
+	'bronze',
+	'silver',
+	'gold',
+	'platinum',
+]);
+export const paymentStatusEnum = pgEnum('payment_status', [
+	'paid',
+	'failed',
+	'pending',
+	'refunded',
+]);
+export const paymentStatusReasonEnum = pgEnum('payment_status_reason', [
+	'payment_failed',
+	'insufficient_funds',
+	'card_expired',
+	'user_cancelled',
+	'system_error',
+]);
+
+export const itemTypeEnum = pgEnum('item_type', ['subscription', 'wash']);
+
 /**
  * Tables
  */
@@ -44,9 +75,7 @@ export const users = pgTable('users', {
 	email: text('email').notNull().unique(),
 	phone: text('phone').notNull(),
 	address: text('address').notNull(),
-	account_status: pgEnum('account_status', ['active', 'cancelled'])('account_status')
-		.notNull()
-		.default('active'),
+	account_status: accountStatusEnum('account_status').notNull().default('active'),
 	cancelled_at: timestamp('cancelled_at'),
 	cancelled_by: text('cancelled_by').notNull().default('system'),
 	cancelled_reason: text('cancelled_reason'),
@@ -71,9 +100,7 @@ export const vehicles = pgTable('vehicles', {
 
 export const subscriptionPlans = pgTable('subscription_plans', {
 	id: serial('id').primaryKey(),
-	plan: pgEnum('subscription_plan', ['bronze', 'silver', 'gold', 'platinum'])(
-		'subscription_plan'
-	).notNull(),
+	plan: subscriptionPlanEnum('plan').notNull(),
 	description: text('description').notNull(),
 	price: numeric('price', { precision: 10, scale: 2 }).notNull(),
 	washes_per_month: integer('washes_per_month').notNull(),
@@ -82,13 +109,6 @@ export const subscriptionPlans = pgTable('subscription_plans', {
 });
 
 // Subscriptions
-
-const subscriptionStatusEnum = pgEnum('subscription_status', [
-	'active',
-	'inactive',
-	'overdue',
-	'transferred',
-]);
 
 export const subscriptions = pgTable('subscriptions', {
 	id: serial('id').primaryKey(),
@@ -169,16 +189,6 @@ export const paymentMethods = pgTable(
 
 // Payments Table
 
-const paymentStatusEnum = pgEnum('payment_status', ['paid', 'failed', 'pending', 'refunded']);
-
-const paymentStatusReasonEnum = pgEnum('payment_status_reason', [
-	'payment_failed',
-	'insufficient_funds',
-	'card_expired',
-	'user_cancelled',
-	'system_error',
-]);
-
 export const payments = pgTable(
 	'payments',
 	{
@@ -193,15 +203,15 @@ export const payments = pgTable(
 		discount_amount: numeric('discount_amount', { precision: 10, scale: 2 }).notNull(),
 		final_amount: numeric('final_amount', { precision: 10, scale: 2 }).notNull(),
 		coupon_id: integer('coupon_id').references(() => coupons.id),
-		status: paymentStatusEnum('payment_status').notNull().default('pending'),
-		status_reason: paymentStatusReasonEnum('payment_status_reason'),
-		item_type: pgEnum('payment_item_type', ['subscription', 'wash'])('payment_item_type').notNull(),
+		status: paymentStatusEnum('status').notNull().default('pending'),
+		status_reason: paymentStatusReasonEnum('status_reason'),
+		item_type: itemTypeEnum('item_type').notNull(),
 		subscription_id: integer('subscription_id').references(() => subscriptions.id),
 		wash_id: integer('wash_id').references(() => washes.id),
 		...timestamps,
 	},
 	(table) => [
-		// check constraint to ensure payment is associated with either a subscription or a wash
+		// check constraint to ensure payment is only associated with either a subscription or a wash
 		check(
 			'item_reference_check',
 			sql`(item_type = 'subscription' AND subscription_id IS NOT NULL) OR
