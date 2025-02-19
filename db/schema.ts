@@ -110,26 +110,33 @@ export const subscriptionPlans = pgTable('subscription_plans', {
 
 // Subscriptions
 
-export const subscriptions = pgTable('subscriptions', {
-	id: serial('id').primaryKey(),
-	user_id: integer('user_id')
-		.notNull()
-		.references(() => users.id),
-	vehicle_id: integer('vehicle_id')
-		.notNull()
-		.references(() => vehicles.id)
-		.unique(),
-	plan_id: integer('plan_id')
-		.notNull()
-		.references(() => subscriptionPlans.id),
-	remaining_washes: integer('remaining_washes').notNull(),
-	subscription_status: subscriptionStatusEnum('subscription_status').notNull().default('active'),
+export const subscriptions = pgTable(
+	'subscriptions',
+	{
+		id: serial('id').primaryKey(),
+		user_id: integer('user_id')
+			.notNull()
+			.references(() => users.id),
+		vehicle_id: integer('vehicle_id')
+			.notNull()
+			.references(() => vehicles.id)
+			.unique(),
+		plan_id: integer('plan_id')
+			.notNull()
+			.references(() => subscriptionPlans.id),
+		remaining_washes: integer('remaining_washes').notNull(),
+		subscription_status: subscriptionStatusEnum('subscription_status').notNull().default('active'),
 
-	start_date: date('start_date').notNull(),
-	end_date: date('end_date').notNull(),
+		start_date: date('start_date').notNull(),
+		end_date: date('end_date').notNull(),
 
-	...timestamps,
-});
+		...timestamps,
+	},
+	(table) => ({
+		// Ensure only one active subscription per vehicle
+		uniqueActiveSubscription: sql`UNIQUE NULLS NOT DISTINCT (${table.vehicle_id}) WHERE ${table.subscription_status} = 'active'`,
+	})
+);
 
 // Subscription Transfers
 export const subscriptionTransfers = pgTable('subscription_transfers', {
