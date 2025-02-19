@@ -100,7 +100,7 @@ export const vehicles = pgTable('vehicles', {
 
 export const subscriptionPlans = pgTable('subscription_plans', {
 	id: serial('id').primaryKey(),
-	plan: subscriptionPlanEnum('plan').notNull(),
+	name: subscriptionPlanEnum('name').notNull(),
 	description: text('description').notNull(),
 	price: numeric('price', { precision: 10, scale: 2 }).notNull(),
 	washes_per_month: integer('washes_per_month').notNull(),
