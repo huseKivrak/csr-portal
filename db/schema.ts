@@ -6,7 +6,6 @@ import {
 	text,
 	serial,
 	integer,
-	date,
 	numeric,
 	boolean,
 	check,
@@ -14,9 +13,9 @@ import {
 
 // Common timestamps for all tables
 const timestamps = {
-	updated_at: timestamp(),
-	created_at: timestamp().notNull().defaultNow(),
-	deleted_at: timestamp(),
+	updated_at: timestamp('updated_at'),
+	created_at: timestamp('created_at').notNull().defaultNow(),
+	deleted_at: timestamp('deleted_at'),
 };
 
 // Enums
@@ -85,7 +84,7 @@ export const users = pgTable('users', {
 // Vehicles table
 export const vehicles = pgTable('vehicles', {
 	id: serial('id').primaryKey(),
-	user_id: serial('user_id')
+	user_id: integer('user_id')
 		.notNull()
 		.references(() => users.id),
 	make: text('make').notNull(),
@@ -127,8 +126,12 @@ export const subscriptions = pgTable(
 		remaining_washes: integer('remaining_washes').notNull(),
 		subscription_status: subscriptionStatusEnum('subscription_status').notNull().default('active'),
 
-		start_date: date('start_date').notNull(),
-		end_date: date('end_date').notNull(),
+		start_date: timestamp('start_date').notNull(),
+		current_period_end: timestamp('current_period_end').notNull(),
+		next_payment_date: timestamp('next_payment_date').notNull(),
+		cancellation_date: timestamp('cancellation_date'),
+		last_payment_date: timestamp('last_payment_date'),
+		last_payment_status: paymentStatusEnum('last_payment_status'),
 
 		...timestamps,
 	},
@@ -232,10 +235,10 @@ export const payments = pgTable(
 export const coupons = pgTable('coupons', {
 	id: serial('id').primaryKey(),
 	code: text('code').notNull(),
-	discount_amount: numeric('discount_amount').notNull(), // amount in dollars
+	discount_amount: numeric('discount_amount').notNull(),
 	is_active: boolean('is_active').notNull().default(true),
-	valid_from: date('valid_from').notNull(),
-	valid_to: date('valid_to').notNull(),
+	valid_from: timestamp('valid_from').notNull(),
+	valid_to: timestamp('valid_to').notNull(),
 
 	...timestamps,
 });
