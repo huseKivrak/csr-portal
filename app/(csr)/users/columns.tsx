@@ -42,7 +42,7 @@ export const columns: ColumnDef<UserDetail>[] = [
       const user = row.original;
       return (
         <Link href={`users/${user.id}`} className="hover:underline">
-          <div>{user.name}</div>
+          <UserHoverCard user={row.original} />
         </Link>
       );
     },
@@ -50,6 +50,7 @@ export const columns: ColumnDef<UserDetail>[] = [
   },
   {
     accessorKey: "subscriptions",
+    enableSorting: false,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Subscription" />,
     cell: ({ row }) => {
       const subscription = row.original.subscriptions?.[ 0 ];
@@ -74,28 +75,7 @@ export const columns: ColumnDef<UserDetail>[] = [
       );
     },
   },
-  {
-    accessorKey: "vehicles",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Vehicles" />,
-    cell: ({ row }) => {
-      const vehicles = row.original.vehicles;
-      return (
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">{vehicles.length}</Badge>
-            <span className="text-muted-foreground text-sm">
-              {vehicles.length === 1 ? 'vehicle' : 'vehicles'}
-            </span>
-          </div>
-          {vehicles.length > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {vehicles.map(v => makeVehicleTitle(v)).join(', ')}
-            </span>
-          )}
-        </div>
-      );
-    },
-  },
+
   {
     accessorKey: "email",
     header: ({ column }) => (
