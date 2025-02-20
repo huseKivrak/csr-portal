@@ -6,7 +6,8 @@ import {
   GalleryVerticalEnd,
   Users,
   LayoutDashboard,
-  CircleDollarSign
+  CircleDollarSign,
+  IdCard
 } from "lucide-react";
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -43,7 +44,7 @@ const data = {
     {
       title: "Subscriptions",
       url: "/subscriptions",
-      icon: Bot,
+      icon: IdCard,
       items: [
         {
           title: "Active Subscriptions",
@@ -70,8 +71,8 @@ const data = {
 
 // Create NavMain component inline
 function NavMain({ items }: { items: typeof data.navMain; }) {
-  const pathname = usePathname();
   //TODO: active route
+  const pathname = usePathname();
 
   return (
     <SidebarGroup>
