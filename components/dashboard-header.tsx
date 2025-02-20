@@ -31,10 +31,10 @@ export default function DashboardHeader({ data }: DashboardHeader) {
   )?.count || 0;
 
   return (
-    <div className='w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
+    <div className='w-full grid grid-cols-3 sm:grid-cols-3 gap-8'>
       <Card>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium whitespace-nowrap mr-2'>
+          <CardTitle className='text-xs sm:text-sm font-medium whitespace-nowrap mr-2'>
             Total Active Users
           </CardTitle>
           <Users2 className='text-blue-500' />
@@ -46,7 +46,7 @@ export default function DashboardHeader({ data }: DashboardHeader) {
 
       <Card>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium whitespace-nowrap mr-2'>
+          <CardTitle className='text-xs sm:text-sm font-medium whitespace-nowrap mr-2'>
             Active Subscriptions
           </CardTitle>
           <IdCard className='text-green-500' />
@@ -58,7 +58,7 @@ export default function DashboardHeader({ data }: DashboardHeader) {
 
       <Card>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-          <CardTitle className='text-sm font-medium whitespace-nowrap mr-2'>
+          <CardTitle className='text-xs sm:text-sm font-medium whitespace-nowrap mr-2'>
             Overdue Subscriptions
           </CardTitle>
           <BadgeDollarSign className='text-red-500' />
