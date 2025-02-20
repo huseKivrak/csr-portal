@@ -57,12 +57,14 @@ export function SubscriptionPlanPieGraph({ subscriptionPlanCount }: PieGraphProp
   }, [ subscriptionPlanCount ]);
 
   return (
-    <Card className='flex flex-col'>
-      <CardHeader className='items-center pb-0'>
+    <Card className='flex flex-col  w-fit' >
+      <CardHeader className='pb-0'>
         <CardTitle>Subscription Plans</CardTitle>
-        <CardDescription>Current plan distribution</CardDescription>
+        <CardDescription className=''>
+          Current plan distribution
+        </CardDescription>
       </CardHeader>
-      <CardContent className='flex-1 pb-0'>
+      <CardContent className='p-0'>
         <ChartContainer
           config={chartConfig}
           className='mx-auto aspect-square max-h-[360px]'
@@ -91,17 +93,18 @@ export function SubscriptionPlanPieGraph({ subscriptionPlanCount }: PieGraphProp
                       >
                         <tspan
                           x={viewBox.cx}
-                          y={viewBox.cy}
-                          className='fill-foreground text-3xl font-bold'
+                          y={(viewBox.cy || 0) - 24}
+                          className='fill-muted-foreground'
                         >
-                          {totalSubscriptions.toLocaleString()}
+                          Total:
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className='fill-muted-foreground'
+                          y={(viewBox.cy || 0) + 8}
+                          className='fill-foreground text-3xl font-bold'
+
                         >
-                          Subscriptions
+                          {totalSubscriptions.toLocaleString()}
                         </tspan>
                       </text>
                     );
