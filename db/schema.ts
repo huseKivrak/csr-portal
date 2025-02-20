@@ -78,6 +78,7 @@ export const users = pgTable('users', {
 	cancelled_at: timestamp('cancelled_at'),
 	cancelled_by: text('cancelled_by').notNull().default('system'),
 	cancelled_reason: text('cancelled_reason'),
+	csr_notes: text('csr_notes'),
 	...timestamps,
 });
 
@@ -118,17 +119,17 @@ export const subscriptions = pgTable(
 			.references(() => users.id),
 		vehicle_id: integer('vehicle_id')
 			.notNull()
-			.references(() => vehicles.id)
-			.unique(),
+			.references(() => vehicles.id),
 		plan_id: integer('plan_id')
 			.notNull()
 			.references(() => subscriptionPlans.id),
 		remaining_washes: integer('remaining_washes').notNull(),
-		subscription_status: subscriptionStatusEnum('subscription_status').notNull().default('active'),
+		status: subscriptionStatusEnum('subscription_status').notNull().default('active'),
 
-		start_date: timestamp('start_date').notNull(),
-		current_period_end: timestamp('current_period_end').notNull(),
-		next_payment_date: timestamp('next_payment_date').notNull(),
+		// Renamed date fields for clarity:
+		subscription_start: timestamp('subscription_start').notNull(),
+		billing_period_end: timestamp('billing_period_end').notNull(),
+		payment_due_date: timestamp('payment_due_date').notNull(),
 		cancellation_date: timestamp('cancellation_date'),
 		last_payment_date: timestamp('last_payment_date'),
 		last_payment_status: paymentStatusEnum('last_payment_status'),
@@ -136,8 +137,8 @@ export const subscriptions = pgTable(
 		...timestamps,
 	},
 	(table) => ({
-		// Ensure only one active subscription per vehicle
-		uniqueActiveSubscription: sql`UNIQUE NULLS NOT DISTINCT (${table.vehicle_id}) WHERE ${table.subscription_status} = 'active'`,
+		// ensure only one active subscription per vehicle
+		uniqueActiveSubscription: sql`UNIQUE NULLS NOT DISTINCT (${table.vehicle_id}) WHERE ${table.status} = 'active'`,
 	})
 );
 
@@ -190,11 +191,8 @@ export const paymentMethods = pgTable(
 		is_default: boolean('is_default').notNull().default(false),
 
 		...timestamps,
-	},
-	(table) => [
-		check('card_exp_date_check', sql`card_exp_month >= 1 AND card_exp_month <= 12`),
-		check('card_exp_year_check', sql`card_exp_year >= 2025`),
-	]
+	}
+	//todo: dynamic card expiration check
 );
 
 // Payments Table
@@ -221,11 +219,11 @@ export const payments = pgTable(
 		...timestamps,
 	},
 	(table) => [
-		// check constraint to ensure payment is only associated with either a subscription or a wash
+		// ensure payment is only associated with either a subscription or a wash
 		check(
 			'item_reference_check',
-			sql`(item_type = 'subscription' AND subscription_id IS NOT NULL) OR
-        (item_type = 'wash' AND wash_id IS NOT NULL)`
+			sql`(item_type = 'subscription' AND subscription_id IS NOT NULL AND wash_id IS NULL)
+          OR (item_type = 'wash' AND wash_id IS NOT NULL AND subscription_id IS NULL)`
 		),
 	]
 );
