@@ -125,8 +125,10 @@ export const subscriptions = pgTable(
 			.references(() => subscriptionPlans.id),
 		remaining_washes: integer('remaining_washes').notNull(),
 		status: subscriptionStatusEnum('status').notNull().default('active'),
-		billing_period_start: timestamp('billing_period_start').notNull(),
-		payment_due_date: timestamp('payment_due_date').notNull(),
+		billing_period_start: timestamp('billing_period_start').notNull().defaultNow(),
+		payment_due_date: timestamp('payment_due_date')
+			.notNull()
+			.default(sql`NOW() + INTERVAL '1 month'`),
 		cancellation_date: timestamp('cancellation_date'),
 		last_payment_date: timestamp('last_payment_date'),
 		last_payment_status: paymentStatusEnum('last_payment_status'),
