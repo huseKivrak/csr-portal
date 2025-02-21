@@ -51,7 +51,12 @@ import { useState } from 'react';
 
 type SubscriptionFormData = z.infer<typeof subscriptionFormSchema>;
 
-export function SubscriptionForm({ userDetail }: { userDetail: UserDetail; }) {
+export function SubscriptionForm({ userDetail,
+  onSuccess
+}: {
+  userDetail: UserDetail;
+  onSuccess?: () => void;
+}) {
 
   const [ openVehicleForm, setOpenVehicleForm ] = useState(false);
 
@@ -101,6 +106,9 @@ export function SubscriptionForm({ userDetail }: { userDetail: UserDetail; }) {
       if (result.success) {
         toast.success('Subscription created successfully');
         form.reset();
+
+        //callback if form is in dialog
+        onSuccess && onSuccess();
       } else {
         // Handle validation/server errors
         Object.entries(result.errors).forEach(([ field, messages ]) => {
