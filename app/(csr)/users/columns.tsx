@@ -5,10 +5,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/data-table/column-header';
-import { UserHoverCard } from '@/components/ui/user-hover-card';
-import { makeVehicleTitle, formatDateTime } from '@/lib/utils';
-import Link from 'next/link';
 import { CopyButton } from '@/components/ui/copy-button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
+import { formatDateTime } from '@/lib/utils';
+import { SubscriptionBadge } from '@/components/subscription-badge';
+import { UserInfoCard } from '@/components/cards/user-info-card';
+import { UserSubscriptionCard } from '@/components/cards/user-subscription-card';
 
 export const columns: ColumnDef<UserDetail>[] = [
   {
@@ -34,58 +37,61 @@ export const columns: ColumnDef<UserDetail>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "user.name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const user = row.original;
+      const userDetail = row.original;
       return (
-        <Link href={`users/${user.id}`} className="hover:underline">
-          <UserHoverCard user={row.original} />
-        </Link>
+        <Popover>
+          <PopoverTrigger>
+            <span className="cursor-pointer hover:underline">
+              {userDetail.user.name}
+            </span>
+          </PopoverTrigger>
+          <PopoverContent className="w-fit p-2">
+            <UserInfoCard user={userDetail.user} />
+          </PopoverContent>
+        </Popover>
       );
     },
     filterFn: "includesString",
   },
   {
     accessorKey: "subscriptions",
-    enableSorting: false,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Subscription" />,
     cell: ({ row }) => {
-      const subscription = row.original.subscriptions?.[ 0 ];
-      const isOverdue = row.original.is_overdue;
-
-      if (!subscription) {
-        return <Badge variant="outline">No subscription</Badge>;
-      }
+      const userDetail = row.original;
 
       return (
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Badge variant={isOverdue ? "destructive" : "secondary"}>
-              {formatDateTime(subscription.next_payment_date, false)}
-            </Badge>
-            {isOverdue && <span className="text-destructive text-sm">Overdue</span>}
-          </div>
-          <span className="text-xs text-muted-foreground">
-            Next payment
-          </span>
+        <div className="flex justify-center">
+          {!userDetail.subscriptions?.length ? (
+            <Badge variant="outline">N/A</Badge>
+          ) : (
+            <Popover>
+              <PopoverTrigger>
+                <SubscriptionBadge subscriptions={userDetail.subscriptions} />
+              </PopoverTrigger>
+              <PopoverContent className="w-fit p-2">
+                <UserSubscriptionCard userDetail={userDetail} />
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       );
-    },
+    }
   },
-
   {
-    accessorKey: "email",
+    accessorKey: "user.email",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
     cell: ({ row }) => {
-      const email = row.original.email;
+      const email = row.original.user.email;
       return (
-        <div className="flex">
-          {email}
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">{email}</span>
           <CopyButton content={email} />
         </div>
       );
@@ -93,33 +99,16 @@ export const columns: ColumnDef<UserDetail>[] = [
     filterFn: "includesString",
   },
   {
-    accessorKey: "lastWash",
+    accessorKey: "last_wash_date",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Last Wash" />,
     cell: ({ row }) => {
-      const date = row.original.last_wash;
-      const washCount = row.original.washes?.length || 0;
+      const lastWash = row.original.last_wash_date;
 
       return (
         <div className="flex flex-col gap-1">
-          <div className="text-sm">
-            {date ? formatDateTime(date) : 'No washes'}
-          </div>
-          {washCount > 0 && (
-            <span className="text-xs text-muted-foreground">
-              Total washes: {washCount}
-            </span>
-          )}
+          {lastWash ? formatDateTime(lastWash, false) : 'N/A'}
         </div>
       );
     },
   },
-  // {
-  //   accessorKey: "updatedAt",
-  //   header: ({ column }) => <DataTableColumnHeader column={column} title="Last Updated" />,
-  //   cell: ({ row }) => (
-  //     <div className="text-sm text-muted-foreground">
-  //       {row.original.updated_at ? formatDateTime(row.original.updated_at) : 'No updates'}
-  //     </div>
-  //   ),
-  // },
 ];
