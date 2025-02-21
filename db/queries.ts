@@ -21,11 +21,7 @@ export async function generateDetailedUsersData() {
 			payments: true,
 			paymentMethods: true,
 			washes: {
-				limit: 1,
 				orderBy: (washes, { desc }) => [desc(washes.created_at)],
-				columns: {
-					created_at: true,
-				},
 			},
 		},
 	});
@@ -38,6 +34,7 @@ export async function generateDetailedUsersData() {
 			subscriptions: userData.subscriptions,
 			payments: userData.payments,
 			payment_methods: userData.paymentMethods,
+			washes: userData.washes,
 		};
 
 		// Computed/derived information
