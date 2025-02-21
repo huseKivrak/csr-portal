@@ -124,11 +124,8 @@ export const subscriptions = pgTable(
 			.notNull()
 			.references(() => subscriptionPlans.id),
 		remaining_washes: integer('remaining_washes').notNull(),
-		status: subscriptionStatusEnum('subscription_status').notNull().default('active'),
-
-		// Renamed date fields for clarity:
-		subscription_start: timestamp('subscription_start').notNull(),
-		billing_period_end: timestamp('billing_period_end').notNull(),
+		status: subscriptionStatusEnum('status').notNull().default('active'),
+		billing_period_start: timestamp('billing_period_start').notNull(),
 		payment_due_date: timestamp('payment_due_date').notNull(),
 		cancellation_date: timestamp('cancellation_date'),
 		last_payment_date: timestamp('last_payment_date'),

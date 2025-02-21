@@ -3,50 +3,57 @@
 import { db } from '@/db';
 import { and, count, desc, eq, gte, lte, or, sum } from 'drizzle-orm';
 import { payments, subscriptionPlans, subscriptions, users } from './schema';
+import { UserDetail, UserDetailBase, UserDetailInfo } from './types';
 
-export async function generateUsersTableData() {
+export async function generateDetailedUsersData() {
 	const usersData = await db.query.users.findMany({
-		columns: {
-			id: true,
-			name: true,
-			email: true,
-			phone: true,
-			address: true,
-			updated_at: true,
-		},
+		where: (users, { eq }) => eq(users.account_status, 'active'),
 		with: {
 			vehicles: true,
 			subscriptions: {
-				where: (subscriptions, { eq }) => eq(subscriptions.subscription_status, 'active'),
+				with: {
+					plan: true,
+				},
+				where: (subscriptions, { eq, or }) =>
+					or(eq(subscriptions.status, 'active'), eq(subscriptions.status, 'overdue')),
+				orderBy: (subscriptions, { desc }) => [desc(subscriptions.payment_due_date)],
 			},
+			payments: true,
+			paymentMethods: true,
 			washes: {
+				limit: 1,
 				orderBy: (washes, { desc }) => [desc(washes.created_at)],
-				limit: 1,
-			},
-			payments: {
-				orderBy: (payments, { desc }) => [desc(payments.created_at)],
-				limit: 1,
+				columns: {
+					created_at: true,
+				},
 			},
 		},
 	});
 
-	return usersData.map((user) => ({
-		id: user.id,
-		name: user.name,
-		email: user.email,
-		phone: user.phone,
-		address: user.address,
-		updated_at: user.updated_at,
-		next_payment_date: user.subscriptions?.[0]?.next_payment_date ?? new Date(),
-		washes: user.washes,
-		last_wash: user.washes?.[0]?.created_at,
-		vehicles: user.vehicles,
-		subscriptions: user.subscriptions,
-		payments: user.payments,
-		is_overdue: user.subscriptions?.[0]?.next_payment_date
-			? user.subscriptions[0].next_payment_date < new Date()
-			: false,
-	}));
+	const detailedUsers = usersData.map((userData): UserDetail => {
+		// Base user detail with related entities
+		const baseDetail: UserDetailBase = {
+			user: userData,
+			vehicles: userData.vehicles,
+			subscriptions: userData.subscriptions,
+			payments: userData.payments,
+			payment_methods: userData.paymentMethods,
+		};
+
+		// Computed/derived information
+		const computedInfo: UserDetailInfo = {
+			next_payment_date: userData.subscriptions?.[0]?.payment_due_date || null,
+			last_wash_date: userData.washes?.[0]?.created_at || null,
+			is_overdue: userData.subscriptions?.some((sub) => sub.status === 'overdue') || false,
+		};
+
+		return {
+			...baseDetail,
+			...computedInfo,
+		};
+	});
+
+	return detailedUsers;
 }
 
 /**
@@ -68,13 +75,10 @@ export async function getUsersWithOverdueSubscriptions() {
 		.innerJoin(subscriptions, eq(users.id, subscriptions.user_id))
 		.where(
 			or(
-				eq(subscriptions.subscription_status, 'overdue'),
+				eq(subscriptions.status, 'overdue'),
 
 				//calculate missed payments dynamically, in case status wasn't updated
-				and(
-					eq(subscriptions.subscription_status, 'active'),
-					lte(subscriptions.next_payment_date, new Date())
-				)
+				and(eq(subscriptions.status, 'active'), lte(subscriptions.last_payment_date, new Date()))
 			)
 		);
 }
@@ -82,34 +86,12 @@ export async function getUsersWithOverdueSubscriptions() {
 export async function getSubscriptionStatusCount() {
 	return db
 		.select({
-			status: subscriptions.subscription_status,
+			status: subscriptions.status,
 			count: count(subscriptions.id),
 		})
 		.from(subscriptions)
-		.groupBy(subscriptions.subscription_status);
+		.groupBy(subscriptions.status);
 }
-
-//Returns the data for the dashboard header
-export async function getDashboardHeaderMetrics() {
-	const [totalActiveUsers, usersWithOverdueSubscriptions, subscriptionStatusCount] =
-		await Promise.all([
-			getTotalActiveUsers(),
-			getUsersWithOverdueSubscriptions(),
-			getSubscriptionStatusCount(),
-		]);
-
-	return {
-		totalActiveUsers: totalActiveUsers[0]?.count || 0,
-		usersWithOverdueSubscriptions: usersWithOverdueSubscriptions.length,
-		subscriptionStatusCount,
-	};
-}
-
-/**
- *
- * Graph Metrics
- *
- */
 
 export async function getSubscriptionPlanCount() {
 	return db
@@ -119,7 +101,7 @@ export async function getSubscriptionPlanCount() {
 		})
 		.from(subscriptions)
 		.innerJoin(subscriptionPlans, eq(subscriptions.plan_id, subscriptionPlans.id))
-		.where(eq(subscriptions.subscription_status, 'active'))
+		.where(eq(subscriptions.status, 'active'))
 		.groupBy(subscriptionPlans.name)
 		.orderBy(desc(count(subscriptions.id)));
 }
@@ -135,3 +117,34 @@ export async function getMonthlyRevenue() {
 			)
 		);
 }
+
+//Returns the data for the dashboard header
+export async function getDashboardMetrics() {
+	const [
+		totalActiveUsers,
+		usersWithOverdueSubscriptions,
+		subscriptionStatusCount,
+		subscriptionPlanCount,
+		monthlyRevenue,
+	] = await Promise.all([
+		getTotalActiveUsers(),
+		getUsersWithOverdueSubscriptions(),
+		getSubscriptionStatusCount(),
+		getSubscriptionPlanCount(),
+		getMonthlyRevenue(),
+	]);
+
+	return {
+		totalActiveUsers: totalActiveUsers[0]?.count || 0,
+		usersWithOverdueSubscriptions: usersWithOverdueSubscriptions.length,
+		subscriptionStatusCount,
+		subscriptionPlanCount,
+		monthlyRevenue,
+	};
+}
+
+/**
+ *
+ * Graph Metrics
+ *
+ */

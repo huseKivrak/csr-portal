@@ -8,6 +8,7 @@ import {
 	payments,
 	coupons,
 	subscriptionPlans,
+	paymentMethods,
 } from './schema';
 
 // Users
@@ -16,21 +17,24 @@ export type InsertUser = typeof users.$inferInsert;
 export const userInsertSchema = createInsertSchema(users);
 export const userSelectSchema = createSelectSchema(users);
 
-export type UserDetail = {
-	id: number;
-	name: string;
-	email: string;
-	phone: string;
-	address: string;
-	updated_at: Date | null;
-	next_payment_date: Date | null;
-	washes?: SelectWash[];
-	last_wash?: Date | null;
+// Base user detail with related entities
+export interface UserDetailBase {
+	user: SelectUser;
 	vehicles: SelectVehicle[];
-	subscriptions?: SelectSubscription[];
-	payments?: SelectPayment[];
+	subscriptions: (SelectSubscription & { plan: SelectSubscriptionPlan })[];
+	payments: SelectPayment[];
+	payment_methods: SelectPaymentMethod[];
+}
+
+// Computed/derived information
+export interface UserDetailInfo {
+	next_payment_date: Date | null;
+	last_wash_date: Date | null;
 	is_overdue: boolean;
-};
+}
+
+// Combined type
+export interface UserDetail extends UserDetailBase, UserDetailInfo {}
 
 // Vehicles
 export type SelectVehicle = typeof vehicles.$inferSelect;
@@ -67,3 +71,9 @@ export type SelectSubscriptionPlan = typeof subscriptionPlans.$inferSelect;
 export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
 export const subscriptionPlanInsertSchema = createInsertSchema(subscriptionPlans);
 export const subscriptionPlanSelectSchema = createSelectSchema(subscriptionPlans);
+
+// Payment Methods
+export type SelectPaymentMethod = typeof paymentMethods.$inferSelect;
+export type InsertPaymentMethod = typeof paymentMethods.$inferInsert;
+export const paymentMethodInsertSchema = createInsertSchema(paymentMethods);
+export const paymentMethodSelectSchema = createSelectSchema(paymentMethods);
