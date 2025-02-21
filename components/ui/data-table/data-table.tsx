@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from 'react';
 import { DataTablePagination } from './pagination';
 import { DataTableViewOptions } from './column-toggle';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -64,21 +65,21 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-6 justify-between ">
-
+      <div className="flex items-center py-6 justify-between">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Search users..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
+
         <DataTableViewOptions table={table} />
+      </div>
+      <div className="text-sm text-muted-foreground mb-2 ml-2">
+        {table.getFilteredSelectedRowModel().rows.length} of{" "}
+        {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
       <div className="rounded-md border">
         <Table>
