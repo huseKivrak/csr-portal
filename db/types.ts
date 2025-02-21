@@ -24,6 +24,7 @@ export interface UserDetailBase {
 	subscriptions: (SelectSubscription & { plan: SelectSubscriptionPlan })[];
 	payments: SelectPayment[];
 	payment_methods: SelectPaymentMethod[];
+	washes: SelectWash[];
 }
 
 // Computed/derived information

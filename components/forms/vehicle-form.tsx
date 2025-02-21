@@ -66,6 +66,8 @@ export function VehicleForm({
       if (result.success) {
         toast.success("Vehicle added successfully");
         form.reset();
+
+        //callback if form is in dialog
         onSuccess && onSuccess();
       } else {
         // Handle validation/server errors
