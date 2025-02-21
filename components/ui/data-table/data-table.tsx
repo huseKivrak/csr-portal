@@ -63,8 +63,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
-      <div className="flex items-center py-4 justify-center ">
+    <div className="w-full">
+      <div className="flex items-center py-6 justify-between ">
 
         <Input
           placeholder="Filter emails..."

@@ -45,7 +45,7 @@ export default async function RootLayout({
               <AppSidebar />
               <div className="flex-1">
                 <Navbar />
-                <div className="container mx-auto p-6 max-w-7xl">
+                <div className="container mx-auto p-8 max-w-[1600px]">
                   <main className="w-full">{children}</main>
                 </div>
               </div>
