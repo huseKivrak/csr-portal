@@ -177,22 +177,17 @@ export const washes = pgTable('washes', {
  */
 
 // Payment Methods Table
-export const paymentMethods = pgTable(
-	'payment_methods',
-	{
-		id: serial('id').primaryKey(),
-		user_id: integer('user_id')
-			.notNull()
-			.references(() => users.id),
-		card_last4: text('card_last4').notNull(),
-		card_exp_month: integer('card_exp_month').notNull(),
-		card_exp_year: integer('card_exp_year').notNull(),
-		is_default: boolean('is_default').notNull().default(false),
-
-		...timestamps,
-	}
-	//todo: dynamic card expiration check
-);
+export const paymentMethods = pgTable('payment_methods', {
+	id: serial('id').primaryKey(),
+	user_id: integer('user_id')
+		.notNull()
+		.references(() => users.id),
+	card_last4: integer('card_last4').notNull(),
+	card_exp_month: integer('card_exp_month').notNull(),
+	card_exp_year: integer('card_exp_year').notNull(),
+	is_default: boolean('is_default').notNull().default(false),
+	...timestamps,
+});
 
 // Payments Table
 
