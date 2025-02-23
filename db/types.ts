@@ -9,6 +9,7 @@ import {
 	coupons,
 	subscriptionPlans,
 	paymentMethods,
+	subscriptionTransfers,
 } from './schema';
 
 // Users
@@ -78,3 +79,9 @@ export type SelectPaymentMethod = typeof paymentMethods.$inferSelect;
 export type InsertPaymentMethod = typeof paymentMethods.$inferInsert;
 export const paymentMethodInsertSchema = createInsertSchema(paymentMethods);
 export const paymentMethodSelectSchema = createSelectSchema(paymentMethods);
+
+// Subscription Transfers
+export type SelectSubscriptionTransfer = typeof subscriptionTransfers.$inferSelect;
+export type InsertSubscriptionTransfer = typeof subscriptionTransfers.$inferInsert;
+export const subscriptionTransferInsertSchema = createInsertSchema(subscriptionTransfers);
+export const subscriptionTransferSelectSchema = createSelectSchema(subscriptionTransfers);
