@@ -2,10 +2,10 @@
 
 import { db } from '@/db';
 import { and, count, desc, eq, gte, lte, or, sum } from 'drizzle-orm';
-import { payments, subscriptionPlans, subscriptions, users } from './schema';
-import { UserDetail, UserDetailBase, UserDetailInfo } from './types';
+import { payments, subscriptionPlans, subscriptions, users } from '../../../db/schema';
+import { UserDetail, UserDetailBase, UserDetailInfo } from '../../../db/types';
 
-export async function generateDetailedUsersData() {
+export async function generateDetailedUsersData(): Promise<UserDetail[]> {
 	const usersData = await db.query.users.findMany({
 		where: (users, { eq }) => eq(users.account_status, 'active'),
 		with: {
@@ -139,9 +139,3 @@ export async function getDashboardMetrics() {
 		monthlyRevenue,
 	};
 }
-
-/**
- *
- * Graph Metrics
- *
- */
