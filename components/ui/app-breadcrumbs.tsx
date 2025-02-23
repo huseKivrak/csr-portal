@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import Link from 'next/link';
 import {
   Breadcrumb,
@@ -21,7 +21,6 @@ const routeLabels: Record<string, string> = {
   'payments': 'Payments',
 };
 
-// Add this type for better type safety
 type BreadcrumbSegment = {
   label: string;
   href: string;
@@ -70,18 +69,20 @@ export function Breadcrumbs() {
     <Breadcrumb className="px-6 py-4 border-b">
       <BreadcrumbList>
         {breadcrumbs.map((item, index) => (
-          <BreadcrumbItem key={item.href}>
-            {item.isCurrentPage ? (
-              <BreadcrumbPage>{item.label}</BreadcrumbPage>
-            ) : (
-              <>
+          <Fragment key={item.href}>
+            <BreadcrumbItem>
+              {item.isCurrentPage ? (
+                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+              ) : (
                 <BreadcrumbLink asChild>
                   <Link href={item.href}>{item.label}</Link>
                 </BreadcrumbLink>
-                {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-              </>
+              )}
+            </BreadcrumbItem>
+            {index < breadcrumbs.length - 1 && (
+              <BreadcrumbSeparator />
             )}
-          </BreadcrumbItem>
+          </Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>

@@ -2,14 +2,10 @@
 
 import type * as React from "react";
 import {
-  Bot,
   GalleryVerticalEnd,
   Users,
-  LayoutDashboard,
-  CircleDollarSign,
   IdCard
 } from "lucide-react";
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 import {
@@ -28,12 +24,7 @@ import {
 const data = {
 
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboard,
-      items: [],
-    },
+
     {
       title: "Users",
       url: "/users",
@@ -60,19 +51,11 @@ const data = {
         },
       ],
     },
-    {
-      title: "Payments",
-      url: "/payments",
-      icon: CircleDollarSign,
-      items: []
-    },
   ],
 };
 
 // Create NavMain component inline
 function NavMain({ items }: { items: typeof data.navMain; }) {
-  //TODO: active route
-  const pathname = usePathname();
 
   return (
     <SidebarGroup>
@@ -116,7 +99,7 @@ function SidebarBrand() {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="none" {...props}>
       <SidebarHeader>
         <SidebarBrand />
       </SidebarHeader>

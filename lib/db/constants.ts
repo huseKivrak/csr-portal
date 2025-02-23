@@ -1,31 +1,43 @@
 import { InsertSubscriptionPlan } from '@/db/types';
 
-export const SUBSCRIPTION_PLANS: InsertSubscriptionPlan[] = [
+interface SubscriptionPlan {
+	id: number;
+	name: string;
+	label: string;
+	description: string;
+	price: string;
+	washes_per_month: number;
+}
+export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 	{
 		id: 1,
 		name: 'bronze',
-		description: 'Bronze plan',
+		label: 'Bronze',
+		description: 'Our most popular option. A wash a week for just $20 a month.',
 		price: '20.00',
 		washes_per_month: 4,
 	},
 	{
 		id: 2,
 		name: 'silver',
-		description: 'Silver plan',
+		label: 'Silver',
+		description: 'A popular upsell -- double the washes for only $10 more a month.',
 		price: '30.00',
 		washes_per_month: 8,
 	},
 	{
 		id: 3,
 		name: 'gold',
-		description: 'Gold plan',
+		label: 'Gold',
+		description: 'Truly a golden deal at only $40 a month. ',
 		price: '40.00',
 		washes_per_month: 12,
 	},
 	{
 		id: 4,
 		name: 'platinum',
-		description: 'Platinum plan',
+		label: 'Platinum',
+		description: 'Our best deal -- a wash every other day for only $50 a month!',
 		price: '50.00',
 		washes_per_month: 16,
 	},

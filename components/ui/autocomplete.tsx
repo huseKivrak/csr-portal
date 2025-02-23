@@ -29,6 +29,7 @@ type AutoCompleteProps = {
   isLoading?: boolean;
   disabled?: boolean;
   placeholder?: string;
+  onOptionSelect?: (option: Option) => void;
 };
 
 // https://github.com/armandsalle/my-site/blob/main/src/react/autocomplete.tsx
@@ -38,6 +39,7 @@ export const AutoComplete = ({
   emptyMessage,
   value,
   onValueChange,
+  onOptionSelect,
   disabled,
   isLoading = false,
 }: AutoCompleteProps) => {
@@ -88,6 +90,7 @@ export const AutoComplete = ({
 
       setSelected(selectedOption);
       onValueChange?.(selectedOption);
+      onOptionSelect?.(selectedOption);
 
       // This is a hack to prevent the input from being focused after the user selects an option
       // We can call this hack: "The next tick"
@@ -95,7 +98,7 @@ export const AutoComplete = ({
         inputRef?.current?.blur();
       }, 0);
     },
-    [ onValueChange ],
+    [ onValueChange, onOptionSelect ],
   );
 
   return (
