@@ -131,7 +131,7 @@ export function ActionSearchBar({
 
   return (
     <div className="w-full max-w-xl mx-auto">
-      <div className="relative flex flex-col justify-start items-center min-h-[300px]">
+      <div className="relative flex flex-col justify-start items-center">
         <div className="w-full max-w-sm sticky top-0 bg-background z-10 pt-4 pb-1">
           <label
             className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block"
