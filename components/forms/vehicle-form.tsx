@@ -35,6 +35,7 @@ import { vehicleColorEnum } from '@/db/schema';
 import { VEHICLE_COLORS } from '@/lib/db/constants';
 import { createVehicleAction } from '@/lib/db/actions/vehicles';
 import { vehicleFormSchema } from "@/db/validation";
+import { ServerAction } from '@/lib/db/actions/types';
 
 type VehicleColor = typeof vehicleColorEnum.enumValues[ number ];
 type VehicleFormData = z.infer<typeof vehicleFormSchema>;
@@ -54,14 +55,14 @@ export function VehicleForm({
       make: "",
       model: "",
       color: vehicleColorEnum.enumValues[ 0 ],
-      year: 2000,
+      year: 1900,
       license_plate: "",
     },
   });
 
   async function onSubmit(data: VehicleFormData) {
     try {
-      const result = await createVehicleAction(data);
+      const result: ServerAction = await createVehicleAction(data);
 
       if (result.success) {
         toast.success("Vehicle added successfully");
@@ -85,30 +86,39 @@ export function VehicleForm({
 
   return (
     <Form {...form}>
-      <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form noValidate onSubmit={(e) => {
+        e.stopPropagation();
+        form.handleSubmit(onSubmit)(e);
+      }}>
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xl font-semibold">New Vehicle</h2>
+          <FormDescription>
+            {`Enter the details below to add a vehicle to ${userDetail.user.name.split(' ')[ 0 ]}'s account.`}
+          </FormDescription>
+        </div>
+
+
         <FormField
           control={form.control}
           name="user_id"
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input type="hidden"  {...field} />
+                <Input type="hidden" {...field} />
               </FormControl>
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="make"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Make</FormLabel>
               <FormControl>
                 <Input placeholder="e.g., Toyota" {...field} />
               </FormControl>
-              <FormDescription>
-                Enter the customer's vehicle manufacturer
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -118,14 +128,11 @@ export function VehicleForm({
           control={form.control}
           name="model"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Model</FormLabel>
               <FormControl>
                 <Input placeholder="e.g., Camry" {...field} />
               </FormControl>
-              <FormDescription>
-                Enter the customer's vehicle model
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -135,7 +142,7 @@ export function VehicleForm({
           control={form.control}
           name="color"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem className="space-y-2">
               <FormLabel>Color</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
@@ -144,7 +151,7 @@ export function VehicleForm({
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        "w-[200px] justify-between",
+                        "w-full justify-between",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -157,7 +164,7 @@ export function VehicleForm({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
+                <PopoverContent className="p-0">
                   <Command>
                     <CommandInput placeholder="Search colors..." className="h-9" />
                     <CommandList>
@@ -187,9 +194,6 @@ export function VehicleForm({
                   </Command>
                 </PopoverContent>
               </Popover>
-              <FormDescription>
-                Select the customer's vehicle color
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -199,7 +203,7 @@ export function VehicleForm({
           control={form.control}
           name="year"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>Year</FormLabel>
               <FormControl>
                 <Input
@@ -209,9 +213,6 @@ export function VehicleForm({
                   onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </FormControl>
-              <FormDescription>
-                Enter the customer's vehicle manufacturing year
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -221,33 +222,26 @@ export function VehicleForm({
           control={form.control}
           name="license_plate"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-2">
               <FormLabel>License Plate</FormLabel>
               <FormControl>
                 <Input placeholder="e.g., ABC123" {...field} />
               </FormControl>
-              <FormDescription>
-                Enter the customer's vehicle license plate number
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="flex gap-4 justify-end">
-          <Button
-            type="submit"
-            disabled={!form.formState.isValid || form.formState.isSubmitting}
-            onClick={() => {
-              console.log('Form validity:', form.formState.isValid);
-              console.log('Form errors:', form.formState.errors);
-              console.log('Form values:', form.getValues());
-            }}
-          >
-            {form.formState.isSubmitting ? "Adding..." : "Add Vehicle"}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          className="w-full my-4"
+          disabled={!form.formState.isValid || form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? "Adding..." : "Add Vehicle"}
+        </Button>
+
       </form>
     </Form>
   );
 }
+

@@ -33,7 +33,7 @@ export function FormWrapper({
   };
 
   return (
-    <Card className="p-6">
+    <Card className="w-full max-w-7xl p-6">
       <AnimatePresence mode="wait">
         {isSubmitted && showSuccessCard ? (
           <motion.div>
