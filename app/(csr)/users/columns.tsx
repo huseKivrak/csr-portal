@@ -4,14 +4,14 @@ import { UserDetail } from "@/db/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DataTableColumnHeader } from '@/components/ui/data-table/column-header';
+import { DataTableColumnHeader } from '@/components/data-table/column-header';
 import { CopyButton } from '@/components/ui/copy-button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 import { formatDateTime } from '@/lib/utils';
 import { SubscriptionBadge } from '@/components/subscription-badge';
-import { UserInfoCard } from '@/components/cards/user-info-card';
 import { UserSubscriptionCard } from '@/components/cards/user-subscription-card';
+import Link from 'next/link';
 
 export const columns: ColumnDef<UserDetail>[] = [
   {
@@ -37,26 +37,23 @@ export const columns: ColumnDef<UserDetail>[] = [
     enableHiding: false,
   },
   {
+    id: "name",
     accessorKey: "user.name",
+    filterFn: "includesString",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
       const userDetail = row.original;
       return (
-        <Popover>
-          <PopoverTrigger>
-            <span className="cursor-pointer hover:underline">
-              {userDetail.user.name}
-            </span>
-          </PopoverTrigger>
-          <PopoverContent className="w-fit p-2">
-            <UserInfoCard user={userDetail.user} />
-          </PopoverContent>
-        </Popover>
+        <Link href={`/users/${userDetail.user.id}`} prefetch={true}>
+          <span className="cursor-pointer hover:underline">
+            {userDetail.user.name}
+          </span>
+        </Link>
+
       );
     },
-    filterFn: "includesString",
   },
   {
     accessorKey: "subscriptions",
@@ -96,7 +93,6 @@ export const columns: ColumnDef<UserDetail>[] = [
         </div>
       );
     },
-    filterFn: "includesString",
   },
   {
     accessorKey: "last_wash_date",
