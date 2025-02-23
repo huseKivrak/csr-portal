@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import postgres, { Sql } from 'postgres';
 import * as schema from './schema';
 import * as relations from './relations';
 import dotenv from 'dotenv';
@@ -12,6 +12,22 @@ if (!connectionString) {
 	process.exit(1);
 }
 
-// Disable prefetch as it is not supported for "Transaction" pool mode
-const client = postgres(connectionString, { prepare: false });
-export const db = drizzle({ client, schema: { ...schema, ...relations }, logger: true });
+let client: Sql<{}>;
+
+//Fixes max connection error in development
+//https://github.com/drizzle-team/drizzle-orm/discussions/688
+
+if (process.env.NODE_ENV === 'production') {
+	client = postgres(connectionString, { prepare: false });
+} else {
+	let globalClient = global as typeof globalThis & { client?: Sql<{}> };
+	if (!globalClient.client) {
+		globalClient.client = postgres(connectionString, { prepare: false });
+	}
+	client = globalClient.client;
+}
+
+export const db = drizzle(client, {
+	schema: { ...schema, ...relations },
+	logger: process.env.NODE_ENV !== 'production',
+});
