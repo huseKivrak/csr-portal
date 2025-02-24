@@ -21,7 +21,6 @@ export async function createVehicleAction(
 			};
 		}
 
-		// Insert the vehicle
 		const data = await db
 			.insert(vehicles)
 			.values({
@@ -44,9 +43,8 @@ export async function createVehicleAction(
 			},
 		};
 	}
-	// Revalidate the vehicles page
-	revalidatePath('/vehicles');
-	revalidatePath('/subscriptions');
+
+	revalidatePath('/');
 
 	return result;
 }
