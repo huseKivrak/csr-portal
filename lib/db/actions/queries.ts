@@ -18,7 +18,12 @@ export async function generateDetailedUsersData(): Promise<UserDetail[]> {
 					or(eq(subscriptions.status, 'active'), eq(subscriptions.status, 'overdue')),
 				orderBy: (subscriptions, { desc }) => [desc(subscriptions.payment_due_date)],
 			},
-			payments: true,
+			payments: {
+				with: {
+					paymentMethod: true,
+				},
+				orderBy: (payments, { desc }) => [desc(payments.created_at)],
+			},
 			paymentMethods: true,
 			washes: {
 				orderBy: (washes, { desc }) => [desc(washes.created_at)],
