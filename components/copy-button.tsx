@@ -1,5 +1,5 @@
 import { LucideClipboard } from 'lucide-react';
-import { Button } from './button';
+import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
