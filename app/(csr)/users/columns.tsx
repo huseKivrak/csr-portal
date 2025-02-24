@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/data-table/column-header';
-import { CopyButton } from '@/components/ui/copy-button';
+import { CopyButton } from '@/components/copy-button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 import { formatDateTime } from '@/lib/utils';
@@ -14,28 +14,6 @@ import { UserSubscriptionCard } from '@/components/cards/user-subscription-card'
 import Link from 'next/link';
 
 export const columns: ColumnDef<UserDetail>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     id: "name",
     accessorKey: "user.name",
@@ -51,7 +29,6 @@ export const columns: ColumnDef<UserDetail>[] = [
             {userDetail.user.name}
           </span>
         </Link>
-
       );
     },
   },
@@ -62,7 +39,7 @@ export const columns: ColumnDef<UserDetail>[] = [
       const userDetail = row.original;
 
       return (
-        <div className="flex justify-center">
+        <div className="">
           {!userDetail.subscriptions?.length ? (
             <Badge variant="outline">N/A</Badge>
           ) : (

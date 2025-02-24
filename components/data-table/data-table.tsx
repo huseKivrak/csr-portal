@@ -26,9 +26,9 @@ import { Input } from "@/components/ui/input";
 import { useState } from 'react';
 import { DataTablePagination } from './pagination';
 import { DataTableViewOptions } from './column-toggle';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 
-interface DataTableProps<TData, TValue> {
+
+export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
@@ -54,18 +54,16 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
     },
   });
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-6 justify-between">
+      <div className="flex items-center py-2 justify-between">
         <Input
           placeholder="Search users..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -77,10 +75,7 @@ export function DataTable<TData, TValue>({
 
         <DataTableViewOptions table={table} />
       </div>
-      <div className="text-sm text-muted-foreground mb-2 ml-2">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
