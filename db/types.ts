@@ -23,7 +23,7 @@ export interface UserDetailBase {
 	user: SelectUser;
 	vehicles: SelectVehicle[];
 	subscriptions: (SelectSubscription & { plan: SelectSubscriptionPlan })[];
-	payments: SelectPayment[];
+	payments: (SelectPayment & { paymentMethod: SelectPaymentMethod })[];
 	payment_methods: SelectPaymentMethod[];
 	washes: SelectWash[];
 }
