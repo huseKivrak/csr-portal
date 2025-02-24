@@ -184,14 +184,18 @@ export const cancelSubscriptionAction = async (
 		return result;
 	}
 
-	await db.update(subscriptions).set({
-		status: 'inactive',
-	});
+	await db
+		.update(subscriptions)
+		.set({
+			status: 'inactive',
+		})
+		.where(eq(subscriptions.id, subscriptionId));
 
 	result = {
 		success: true,
 		data: subscription,
 	};
 
+	revalidatePath('/');
 	return result;
 };
