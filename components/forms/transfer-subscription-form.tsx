@@ -2,7 +2,6 @@
 
 import type React from "react";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from 'zod';
@@ -49,7 +48,7 @@ interface SubscriptionTransferFormProps {
 
 
 
-export function SubscriptionTransferForm({
+export function TransferSubscriptionForm({
   userDetail,
   onSuccess
 }: SubscriptionTransferFormProps) {
