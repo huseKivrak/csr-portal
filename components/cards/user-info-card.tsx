@@ -1,105 +1,161 @@
-import { User, Receipt, Circle, IdCard } from "lucide-react";
+'use client';
+
+import { useState } from 'react';
+import { Pencil, Calendar, Mail, Phone, MapPin, History, CreditCard, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { UserDetail } from "@/db/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatDateTime, makeVehicleTitle } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { formatDateTime } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { UserForm } from '@/components/forms/user-form';
+import { ResponsiveDialog } from '@/components/ui/responsive-dialog';
+import { Button } from '@/components/ui/button';
+import { CopyButton } from '@/components/copy-button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { UserActionsSection } from '../action-search/user-actions-section';
 
 export function UserInfoCard({ userDetail }: { userDetail: UserDetail; }) {
-  const { subscriptions, is_overdue, vehicles } = userDetail;
-  // Get last 5 payments and washes
-  const recentPayments = userDetail.payments?.slice(0, 5) || [];
+  const { subscriptions, is_overdue } = userDetail;
+  const [ openEditProfile, setOpenEditProfile ] = useState(false);
 
-  const getVehicleTitle = (vehicleId: number) => {
-    if (!vehicleId) return 'No vehicle';
-    const vehicle = vehicles?.find(v => v.id === vehicleId);
-    return vehicle ? makeVehicleTitle(vehicle) : 'Unknown Vehicle';
+
+
+  const accountStatus = is_overdue ? 'overdue' : 'active';
+  const getStatusBadge = () => {
+    switch (accountStatus) {
+      case 'active':
+        return <Badge className="bg-green-500">Active</Badge>;
+      case 'overdue':
+        return <Badge variant="destructive">Overdue</Badge>;
+      default:
+        return <Badge>Unknown</Badge>;
+    }
   };
 
   return (
-    <Card className="w-full px-4">
+    <Card className="w-full px-2 tracking-tight">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-xl">
+          <CardTitle className="flex items-center gap-4 text-2xl">
+            <Avatar className="w-10 h-10">
+              <AvatarImage />
+              <AvatarFallback>
+                {userDetail.user.name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
             {userDetail.user.name}
+            <div className="ml-2">{getStatusBadge()}</div>
+            <ResponsiveDialog
+              open={openEditProfile}
+              onOpenChange={setOpenEditProfile}
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                >
+                  <Pencil className="h-4 w-4" />
+                  <span className="sr-only">Edit Profile</span>
+                </Button>
+              }
+            >
+              <UserForm
+                userDetail={userDetail}
+                onSuccess={() => setOpenEditProfile(false)}
+              />
+            </ResponsiveDialog>
           </CardTitle>
-          <CardDescription>
-            Member since {formatDateTime(userDetail.user.created_at, false)}
+
+          <CardDescription className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-muted-foreground font-medium">Member Since:</span>
+                  <span className="text-foreground truncate">
+                    {formatDateTime(userDetail.user.created_at, false).split(',')[ 1 ]}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <CreditCard className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-muted-foreground font-medium">Last Payment:</span>
+                  <span className="text-foreground truncate">
+                    {userDetail.payments?.length > 0
+                      ? formatDateTime(userDetail.payments[ 0 ].created_at, false)
+                      : 'N/A'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <History className="h-4 w-4 text-muted-foreground shrink-0" />
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-muted-foreground font-medium">Last Wash:</span>
+                  <span className="text-foreground truncate">
+                    {userDetail.washes?.length > 0
+                      ? formatDateTime(userDetail.washes[ 0 ].created_at, false)
+                      : 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+
+              <div className="flex items-center gap-3 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+                <span className="truncate text-foreground">
+                  {userDetail.user.email}
+                </span>
+                <CopyButton content={userDetail.user.email} />
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                <span className="text-foreground">
+                  {userDetail.user.phone || 'Not provided'}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                <span className="text-foreground">
+                  {userDetail.user.address || 'Not provided'}
+                </span>
+              </div>
+            </div>
+
           </CardDescription>
         </div>
       </CardHeader>
+
       <CardContent>
-        <Tabs defaultValue="subscriptions" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-          </TabsList>
+        {accountStatus === 'overdue' && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Payment Overdue</AlertTitle>
+            <AlertDescription>
+              This account has overdue payments. The customer may be unable to use their subscription until payment is resolved.
+            </AlertDescription>
+          </Alert>
+        )}
 
-          <TabsContent value="subscriptions" className="space-y-3">
-            <div className="flex items-center gap-2">
-              <IdCard className="h-4 w-4" />
-              <h3 className="font-medium">Active Subscriptions</h3>
-            </div>
-            {subscriptions.length > 0 ? (
-              <div className="space-y-2">
-                {subscriptions.map((subscription) => (
-                  <div
-                    key={subscription.id}
-                    className="flex items-center justify-between text-sm border-b pb-2"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Circle
-                        className={`h-3 w-3 fill-current ${is_overdue ? 'text-destructive' : 'text-green-600'
-                          }`}
-                      />
-                      <span className="text-muted-foreground">
-                        {getVehicleTitle(subscription.vehicle_id)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="uppercase text-xs">
-                        {subscription.plan.name}
-                      </span>
-                      <span className="text-xs">
-                        {subscription.remaining_washes}/{subscription.plan.washes_per_month}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No active subscriptions</p>
-            )}
-          </TabsContent>
-
-          <TabsContent value="payments" className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Receipt className="h-4 w-4" />
-              <h3 className="font-medium">Recent Payments</h3>
-            </div>
-            {recentPayments.length > 0 ? (
-              <div className="space-y-2">
-                {recentPayments.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className="flex justify-between text-sm border-b pb-2"
-                  >
-                    <div className="text-muted-foreground">
-                      {formatDateTime(payment.created_at, false)}
-                    </div>
-                    <div className={payment.status === 'failed' ? 'text-red-500' : ''}>
-                      {`$ ${payment.final_amount} `}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No recent payments</p>
-            )}
-          </TabsContent>
-        </Tabs>
+        {accountStatus === 'active' && (
+          <Alert className="border-green-500 mb-4">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <AlertTitle className="text-green-500">Account Active</AlertTitle>
+            <AlertDescription>
+              This account is in good standing. Customer has full access to all subscribed services.
+            </AlertDescription>
+          </Alert>
+        )}
       </CardContent>
+      <CardFooter>
+        <UserActionsSection userDetail={userDetail} />
+      </CardFooter>
     </Card>
   );
 };
