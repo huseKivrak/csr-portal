@@ -105,16 +105,46 @@ export function UserActionsSection({ userDetail }: { userDetail: UserDetail; }) 
   const [ selectedAction, setSelectedAction ] = useState<string | null>(null);
   const [ enableHotkeys, setEnableHotkeys ] = useState(false);
 
-  // Initialize hotkeys for each action
-  baseItems.forEach(item => {
-    useHotkeys(
-      item.hotkey,
-      () => {
-        setSelectedAction(item.value);
-      },
-      { enabled: enableHotkeys }
-    );
-  });
+  //Add hotkeys for each action individually (hooks cannot be used within callback)
+  useHotkeys(
+    baseItems[ 0 ].hotkey,
+    () => {
+      setSelectedAction(baseItems[ 0 ].value);
+    },
+    { enabled: enableHotkeys }
+  );
+
+  useHotkeys(
+    baseItems[ 1 ].hotkey,
+    () => {
+      setSelectedAction(baseItems[ 1 ].value);
+    },
+    { enabled: enableHotkeys }
+  );
+
+  useHotkeys(
+    baseItems[ 2 ].hotkey,
+    () => {
+      setSelectedAction(baseItems[ 2 ].value);
+    },
+    { enabled: enableHotkeys }
+  );
+
+  useHotkeys(
+    baseItems[ 3 ].hotkey,
+    () => {
+      setSelectedAction(baseItems[ 3 ].value);
+    },
+    { enabled: enableHotkeys }
+  );
+
+  useHotkeys(
+    baseItems[ 4 ].hotkey,
+    () => {
+      setSelectedAction(baseItems[ 4 ].value);
+    },
+    { enabled: enableHotkeys }
+  );
 
   const router = useRouter();
 
