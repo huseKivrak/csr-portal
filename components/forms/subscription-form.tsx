@@ -35,8 +35,6 @@ import { cn, makeVehicleTitle } from '@/lib/utils';
 import { SUBSCRIPTION_PLANS } from '@/lib/db/constants';
 import { AlertCircle, Car, Check, ChevronsUpDown } from 'lucide-react';
 import { Separator } from '../ui/separator';
-
-
 import { VehicleForm } from './vehicle-form';
 import { Input } from '../ui/input';
 import { useState } from 'react';
@@ -44,6 +42,8 @@ import { PaymentMethodForm } from './payment-method-form';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertTitle } from '../ui/alert';
 import { ServerAction } from '@/lib/db/actions/types';
+import { ResponsiveDialog } from '../ui/responsive-dialog';
+import { formatPaymentMethod } from '@/lib/utils';
 
 type SubscriptionFormData = z.infer<typeof subscriptionFormSchema>;
 
@@ -56,6 +56,9 @@ export function SubscriptionForm({ userDetail,
 
   const [ openVehicleForm, setOpenVehicleForm ] = useState(false);
   const [ openPaymentMethodForm, setOpenPaymentMethodForm ] = useState(false);
+  const [ planPopoverOpen, setPlanPopoverOpen ] = useState(false);
+  const [ vehiclePopoverOpen, setVehiclePopoverOpen ] = useState(false);
+  const [ paymentMethodPopoverOpen, setPaymentMethodPopoverOpen ] = useState(false);
   const form = useForm<SubscriptionFormData>({
     resolver: zodResolver(subscriptionFormSchema),
     mode: 'onChange',
@@ -86,21 +89,16 @@ export function SubscriptionForm({ userDetail,
     );
   };
 
-  // Helper function to format payment method display
-  const formatPaymentMethod = (method: SelectPaymentMethod) => {
-    return `•••• ${method.card_last4} (expires ${method.card_exp_month}/${method.card_exp_year})`;
-  };
+
 
 
   async function onSubmit(data: SubscriptionFormData) {
     try {
 
       const result: ServerAction = await createSubscriptionAction(data);
-
       if (result.success) {
         toast.success('Subscription created successfully');
         form.reset();
-
         //callback if form is in dialog
         onSuccess && onSuccess();
       } else {
@@ -149,7 +147,7 @@ export function SubscriptionForm({ userDetail,
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Plan</FormLabel>
-              <Popover>
+              <Popover open={planPopoverOpen} onOpenChange={setPlanPopoverOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -191,8 +189,8 @@ export function SubscriptionForm({ userDetail,
                                 shouldValidate: true,
                               });
                               form.setValue("remaining_washes", plan.washes_per_month);
+                              setPlanPopoverOpen(false);
                             }}
-
                           >
                             <div className="flex flex-col">
                               <span className="font-medium">{plan.label}</span>
@@ -250,7 +248,7 @@ export function SubscriptionForm({ userDetail,
                     None available
                   </Button>
                 ) : (
-                  <Popover>
+                  <Popover open={vehiclePopoverOpen} onOpenChange={setVehiclePopoverOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -290,6 +288,7 @@ export function SubscriptionForm({ userDetail,
                                           shouldTouch: true,
                                           shouldValidate: true,
                                         });
+                                        setVehiclePopoverOpen(false);
                                       }
                                     }}
                                     disabled={subscribed}
@@ -341,23 +340,24 @@ export function SubscriptionForm({ userDetail,
             If no unsubscribed vehicles are available, register a new one to start a subscription.
           </AlertDescription>
 
-          <Popover open={openVehicleForm} onOpenChange={setOpenVehicleForm}>
-            <PopoverTrigger asChild >
+          <ResponsiveDialog
+            open={openVehicleForm}
+            onOpenChange={setOpenVehicleForm}
+            trigger={
               <Button
                 type="button"
                 variant="outline"
-                className='w-full bg-background border-chart-2 hover:bg-chart-2/50 hover:text-background dark:hover:text-foreground '
+                className='w-full bg-background border-chart-2 hover:bg-chart-2/50 hover:text-background dark:hover:text-foreground'
               >
                 <Car className='h-10 w-10 text-chart-2' />
                 <span className='text-base'>
                   Add Vehicle
                 </span>
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48">
-              <VehicleForm userDetail={userDetail} onSuccess={() => setOpenVehicleForm(false)} />
-            </PopoverContent>
-          </Popover>
+            }
+          >
+            <VehicleForm userDetail={userDetail} onSuccess={() => setOpenVehicleForm(false)} />
+          </ResponsiveDialog>
 
         </Alert>
 
@@ -368,7 +368,7 @@ export function SubscriptionForm({ userDetail,
             <FormItem className="flex flex-col">
               <FormLabel>Payment Method</FormLabel>
               <div className="flex items-center gap-2">
-                <Popover>
+                <Popover open={paymentMethodPopoverOpen} onOpenChange={setPaymentMethodPopoverOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
@@ -406,6 +406,7 @@ export function SubscriptionForm({ userDetail,
                                   shouldTouch: true,
                                   shouldValidate: true,
                                 });
+                                setPaymentMethodPopoverOpen(false);
                               }}
                             >
                               <div className="flex items-center gap-2">
@@ -432,8 +433,10 @@ export function SubscriptionForm({ userDetail,
                   </PopoverContent>
                 </Popover>
 
-                <Popover open={openPaymentMethodForm} onOpenChange={setOpenPaymentMethodForm}>
-                  <PopoverTrigger asChild>
+                <ResponsiveDialog
+                  open={openPaymentMethodForm}
+                  onOpenChange={setOpenPaymentMethodForm}
+                  trigger={
                     <Button
                       type="button"
                       variant="outline"
@@ -441,11 +444,13 @@ export function SubscriptionForm({ userDetail,
                     >
                       Add
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[400px]">
-                    <PaymentMethodForm userDetail={userDetail} onSuccess={() => setOpenPaymentMethodForm(false)} />
-                  </PopoverContent>
-                </Popover>
+                  }
+                >
+                  <PaymentMethodForm
+                    userDetail={userDetail}
+                    onSuccess={() => setOpenPaymentMethodForm(false)}
+                  />
+                </ResponsiveDialog>
               </div>
               <FormMessage />
             </FormItem>
