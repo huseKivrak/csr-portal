@@ -59,7 +59,6 @@ export function SubscriptionPlanPieGraph({ subscriptionPlanCount }: PieGraphProp
   return (
     <Card className='flex flex-col  w-fit' >
       <CardHeader className='pb-0'>
-        <CardTitle>Subscription Plans</CardTitle>
         <CardDescription className=''>
           Current plan distribution
         </CardDescription>
