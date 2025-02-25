@@ -3,11 +3,9 @@
 import { UserDetail } from "@/db/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/data-table/column-header';
 import { CopyButton } from '@/components/copy-button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-
 import { formatDateTime } from '@/lib/utils';
 import { SubscriptionBadge } from '@/components/subscription-badge';
 import { UserSubscriptionCard } from '@/components/cards/user-subscription-card';

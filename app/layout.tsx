@@ -3,9 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from '@/components/ui/sonner';
 import "./globals.css";
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/ui/app-sidebar';
-import { cookies } from 'next/headers';
+
+
 import { Navbar } from '@/components/ui/navbar';
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +27,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // sidebar state stored in cookie for persistence
-  const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
-
+  // const cookieStore = await cookies();
+  // const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

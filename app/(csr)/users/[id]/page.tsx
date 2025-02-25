@@ -1,6 +1,3 @@
-import { db } from '@/db';
-import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import { UserDetailView } from '@/components/views/UserDetailView';
 import { notFound } from 'next/navigation';
 import { generateDetailedUsersData } from '@/lib/db/actions/queries';
