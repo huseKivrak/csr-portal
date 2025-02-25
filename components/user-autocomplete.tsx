@@ -4,7 +4,7 @@ import { AutoComplete, type Option } from "./ui/autocomplete";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Search, Users2 } from "lucide-react";
+import { Users2 } from "lucide-react";
 
 export function UsersAutocomplete({
   users,
