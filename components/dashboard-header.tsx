@@ -11,6 +11,7 @@ import { UsersAutocomplete } from './user-autocomplete';
 import { UserDetail } from '@/db/types';
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
+import { Separator } from './ui/separator';
 
 interface DashboardHeader {
   data: {
@@ -40,8 +41,14 @@ export default function DashboardHeader({ data }: DashboardHeader) {
 
   return (
     <div className="w-full">
-      <h1 className="text-4xl font-bold tracking-widest font-mono my-4">AMP Customer Service Portal</h1>
       <div className="bg-card rounded-lg p-4 mb-6 border shadow-sm">
+        <h1 className="text-4xl font-bold tracking-widest font-mono my-2">AMP Customer Service Dashboard</h1>
+        <Separator className='my-4' />
+        <h2 className="text-2xl font-bold tracking-widest text-muted-foreground max-w-4xl my-2">
+          Welcome back, CSR!
+          <br />
+          Search for a user below to get started.
+        </h2>
         <div className="flex flex-col gap-3 mb-4">
           <UsersAutocomplete users={users} />
           <Button
