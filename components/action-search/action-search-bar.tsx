@@ -17,7 +17,7 @@ export type SearchItem = {
   value: string;
   icon: React.ReactNode;
   description?: string;
-  short?: string;
+  hotkey?: string;
   end?: string;
 } & (
     | { isRedirect: true, redirectUrl: string; }
@@ -130,112 +130,100 @@ export function ActionSearchBar({
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <div className="relative flex flex-col justify-start items-center">
-        <div className="w-full max-w-sm sticky top-0 bg-background z-10 pt-4 pb-1">
-          <label
-            className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 block"
-            htmlFor="search"
-          >
-            {title}
-          </label>
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder={placeholder}
-              value={query}
-              onChange={handleInputChange}
-              onFocus={handleFocus}
-              onBlur={() =>
-                setTimeout(() => setIsFocused(false), 200)
-              }
-              className="pl-3 pr-9 py-1.5 h-9 text-sm rounded-lg focus-visible:ring-offset-0"
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4">
-              <AnimatePresence mode="popLayout">
-                {query.length > 0 ? (
-                  <motion.div
-                    key="send"
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 20, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Send className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="search"
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 20, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+    <div className="w-full">
+      <div className="relative">
+        <label
+          className="font-medium mb-1 ml-2 block"
+          htmlFor="search"
+        >
+          {title}
+        </label>
+        <div className="relative">
+          <Input
+            type="text"
+            placeholder={placeholder}
+            value={query}
+            onChange={handleInputChange}
+            onFocus={handleFocus}
+            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+            className="pl-3 pr-9 py-1.5 h-9 text-sm rounded-lg focus-visible:ring-offset-0"
+          />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4">
+            <AnimatePresence mode="popLayout">
+              {query.length > 0 ? (
+                <motion.div
+                  key="send"
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 20, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Send className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="search"
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 20, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        <div className="w-full max-w-sm">
-          <AnimatePresence>
-            {isFocused && result && (
-              <motion.div
-                className="w-full border rounded-md shadow-xs overflow-hidden dark:border-gray-800 bg-white dark:bg-black mt-1"
-                variants={container}
-                initial="hidden"
-                animate="show"
-                exit="exit"
-              >
-                <motion.ul>
-                  {result.actions.map((action) => (
-                    <motion.li
-                      key={action.id}
-                      className="px-3 py-2 flex items-center justify-between hover:bg-gray-200 dark:hover:bg-zinc-900  cursor-pointer rounded-md"
-                      variants={item}
-                      layout
-                      onClick={() => {
-                        onActionSelect(action);
-                        setIsFocused(false);
-                        setQuery("");
-                      }}
-                    >
-                      <div className="flex items-center gap-2 justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-500">
-                            {action.icon}
-                          </span>
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {action.label}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {action.description}
-                          </span>
-                        </div>
-                      </div>
+        <AnimatePresence>
+          {isFocused && result && (
+            <motion.div
+              className="absolute left-0 right-0 top-full mt-1 z-50 border rounded-md shadow-lg dark:border-gray-800 bg-white dark:bg-black"
+              variants={container}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+            >
+              <motion.ul className="max-h-[300px] overflow-y-auto">
+                {result.actions.map((action) => (
+                  <motion.li
+                    key={action.id}
+                    className="px-3 py-2 flex items-center justify-between hover:bg-gray-200 dark:hover:bg-zinc-900 cursor-pointer rounded-md"
+                    variants={item}
+                    layout
+                    onClick={() => {
+                      onActionSelect(action);
+                      setIsFocused(false);
+                      setQuery("");
+                    }}
+                  >
+                    <div className="flex items-center gap-2 justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-400">
-                          {action.short}
+                        <span className="text-gray-500">
+                          {action.icon}
                         </span>
-                        <span className="text-xs text-gray-400 text-right">
-                          {action.end}
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {action.label}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {action.description}
                         </span>
                       </div>
-                    </motion.li>
-                  ))}
-                </motion.ul>
-                <div className="mt-2 px-3 py-2 border-t border-gray-100 dark:border-gray-800">
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>Press ⌘K to open commands</span>
-                    <span>ESC to cancel</span>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400">
+                        {action.hotkey}
+                      </span>
+                      <span className="text-xs text-gray-400 text-right">
+                        {action.end}
+                      </span>
+                    </div>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
