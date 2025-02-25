@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/app-breadcrumbs';
+import { ModeToggle } from './mode-toggle';
 
 export function Navbar() {
   return (
@@ -9,9 +10,9 @@ export function Navbar() {
         <div className="flex-1">
           <Breadcrumbs />
         </div>
-        {/* <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4">
           <ModeToggle />
-        </div> */}
+        </div>
       </div>
     </nav>
   );
