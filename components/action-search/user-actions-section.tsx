@@ -5,14 +5,14 @@ import dynamic from 'next/dynamic';
 import { UserDetail } from "@/db/types";
 import { UserForm } from "../forms/user-form";
 import { FormWrapper } from '../forms/form-wrapper';
-import { Car, CreditCard, IdCard, UserCog2, Users2 } from 'lucide-react';
+import { Car, CreditCard, IdCard, UserCog2 } from 'lucide-react';
 import { DataTableSkeleton } from '../data-table/data-table-skeleton';
 import { columns } from '@/app/(csr)/users/columns';
 import { ColumnDef } from '@tanstack/react-table';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
-import { Separator } from '../ui/separator';
+import { SearchAction } from '@/lib/db/actions/types';
 
 const ActionSearchBar = dynamic(
   () => import('../action-search/action-search-bar').then(mod => mod.ActionSearchBar),
@@ -58,7 +58,7 @@ const DataTable = dynamic(
   }
 );
 
-const baseItems = [
+const baseItems: SearchAction[] = [
   {
     id: '1',
     label: 'Add Subscription',
@@ -118,7 +118,7 @@ export function UserActionsSection({ userDetail }: { userDetail: UserDetail; }) 
 
   const router = useRouter();
 
-  const handleActionSelect = (action: any) => {
+  const handleActionSelect = (action: SearchAction) => {
     if (action.isRedirect) {
       router.push(action.redirectUrl);
     } else {

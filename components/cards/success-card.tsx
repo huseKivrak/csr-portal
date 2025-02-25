@@ -1,8 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { makeVehicleTitle } from "@/lib/utils";
-import { SelectVehicle } from "@/db/types";
 import { RefreshCcw } from 'lucide-react';
 
 

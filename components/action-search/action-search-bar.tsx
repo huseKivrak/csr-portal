@@ -9,6 +9,7 @@ import {
   Send,
 } from "lucide-react";
 import useDebounce from "@/hooks/use-debounce";
+import { SearchAction } from '@/lib/db/actions/types';
 
 
 export type SearchItem = {
@@ -29,7 +30,7 @@ interface SearchResult {
 
 export type ActionSearchBarProps = {
   actions: SearchItem[];
-  onActionSelect: (Action: SearchItem) => void;
+  onActionSelect: (action: SearchAction) => void;
   title?: string;
   placeholder?: string;
   defaultOpen?: boolean;
@@ -192,7 +193,7 @@ export function ActionSearchBar({
                     variants={item}
                     layout
                     onClick={() => {
-                      onActionSelect(action);
+                      onActionSelect(action as SearchAction);
                       setIsFocused(false);
                       setQuery("");
                     }}

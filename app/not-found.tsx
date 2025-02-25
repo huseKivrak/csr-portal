@@ -8,7 +8,7 @@ export default function NotFound() {
           404: Not Found
         </h1>
         <p className="text-muted-foreground max-w-[600px] text-lg">
-          Sorry, we couldn't find the requested resource. The user ID might be
+          Sorry, we couldn&apos;t find the requested resource. The user ID might be
           invalid or no longer exists.
         </p>
       </div>
