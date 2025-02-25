@@ -2,7 +2,7 @@
 
 import { createSubscriptionAction } from '@/lib/db/actions/subscriptions';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { FormProps, useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from 'sonner';
 import { Button } from "@/components/ui/button";
@@ -28,8 +28,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-import { UserDetail } from "@/db/types";
 import { subscriptionFormSchema } from "@/db/validation";
 import { cn, makeVehicleTitle } from '@/lib/utils';
 import { SUBSCRIPTION_PLANS } from '@/lib/db/constants';
@@ -41,7 +39,7 @@ import { useState } from 'react';
 import { PaymentMethodForm } from './payment-method-form';
 import { Alert, AlertDescription } from '../ui/alert';
 import { AlertTitle } from '../ui/alert';
-import { ServerAction } from '@/lib/db/actions/types';
+import { CSRFormProps, ServerAction } from '@/lib/db/actions/types';
 import { ResponsiveDialog } from '../ui/responsive-dialog';
 import { formatPaymentMethod } from '@/lib/utils';
 
@@ -49,10 +47,7 @@ type SubscriptionFormData = z.infer<typeof subscriptionFormSchema>;
 
 export function SubscriptionForm({ userDetail,
   onSuccess
-}: {
-  userDetail: UserDetail;
-  onSuccess?: () => void;
-}) {
+}: CSRFormProps) {
 
   const [ openVehicleForm, setOpenVehicleForm ] = useState(false);
   const [ openPaymentMethodForm, setOpenPaymentMethodForm ] = useState(false);

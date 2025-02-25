@@ -17,17 +17,15 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { paymentMethodFormSchema } from '@/db/validation';
 import { createPaymentMethodAction } from '@/lib/db/actions/purchaseMethods';
-import { UserDetail } from '@/db/types';
-import { ServerAction } from '@/lib/db/actions/types';
+import { CSRFormProps, ServerAction } from '@/lib/db/actions/types';
+
+
 type PaymentMethodFormData = z.infer<typeof paymentMethodFormSchema>;
 
 export function PaymentMethodForm({
   userDetail,
   onSuccess,
-}: {
-  userDetail: UserDetail;
-  onSuccess?: () => void;
-}) {
+}: CSRFormProps) {
   const form = useForm<PaymentMethodFormData>({
     resolver: zodResolver(paymentMethodFormSchema),
     mode: 'onChange',

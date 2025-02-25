@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { UserDetail } from "@/db/types";
 import {
   Popover,
   PopoverContent,
@@ -35,7 +34,7 @@ import { vehicleColorEnum } from '@/db/schema';
 import { VEHICLE_COLORS } from '@/lib/db/constants';
 import { createVehicleAction } from '@/lib/db/actions/vehicles';
 import { vehicleFormSchema } from "@/db/validation";
-import { ServerAction } from '@/lib/db/actions/types';
+import { CSRFormProps, ServerAction } from '@/lib/db/actions/types';
 
 type VehicleColor = typeof vehicleColorEnum.enumValues[ number ];
 type VehicleFormData = z.infer<typeof vehicleFormSchema>;
@@ -43,10 +42,7 @@ type VehicleFormData = z.infer<typeof vehicleFormSchema>;
 export function VehicleForm({
   userDetail,
   onSuccess
-}: {
-  userDetail: UserDetail;
-  onSuccess?: () => void;
-}) {
+}: CSRFormProps) {
   const form = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleFormSchema),
     mode: "onChange",

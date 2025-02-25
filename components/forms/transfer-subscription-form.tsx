@@ -33,21 +33,16 @@ import {
 } from "@/components/ui/form";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn, makeVehicleTitle } from "@/lib/utils";
-import { UserDetail } from "@/db/types";
 import { transferSubscriptionAction } from "@/lib/db/actions/subscriptions";
-import { ServerAction } from '@/lib/db/actions/types';
+import { CSRFormProps, ServerAction } from '@/lib/db/actions/types';
 
 type TransferFormData = z.infer<typeof subscriptionTransferFormSchema>;
 
-interface SubscriptionTransferFormProps {
-  userDetail: UserDetail;
-  onSuccess?: () => void;
-}
 
 export function TransferSubscriptionForm({
   userDetail,
   onSuccess
-}: SubscriptionTransferFormProps) {
+}: CSRFormProps) {
   const activeSubscriptions = userDetail.subscriptions.filter(sub => sub.status === 'active');
 
   const [ subscriptionPopoverOpen, setSubscriptionPopoverOpen ] = useState(false);

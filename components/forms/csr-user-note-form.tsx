@@ -17,9 +17,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { StickyNote, Plus } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserDetail } from "@/db/types";
-import { addCSRNoteAction } from '@/lib/db/actions/users';
 
+import { addCSRNoteAction } from '@/lib/db/actions/users';
+import { CSRFormProps } from '@/lib/db/actions/types';
 export const csrNoteSchema = z.object({
   userId: z.number(),
   csr_notes: z
@@ -32,12 +32,9 @@ export const csrNoteSchema = z.object({
     }),
 });
 
-type CSRNoteFormProps = {
-  userDetail: UserDetail;
-  onSuccess?: () => void;
-};
 
-export function CSRNoteForm({ userDetail, onSuccess }: CSRNoteFormProps) {
+
+export function CSRNoteForm({ userDetail, onSuccess }: CSRFormProps) {
   const [ isExpanded, setIsExpanded ] = useState(false);
 
   const form = useForm<z.infer<typeof csrNoteSchema>>({

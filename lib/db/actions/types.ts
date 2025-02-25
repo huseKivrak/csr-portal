@@ -1,3 +1,5 @@
+import { UserDetail } from '@/db/types';
+
 export type ServerAction =
 	| {
 			success: true;
@@ -24,3 +26,8 @@ export type SearchAction = {
 			isRedirect?: false;
 	  }
 );
+
+export type CSRFormProps = {
+	userDetail: UserDetail;
+	onSuccess?: () => void;
+};

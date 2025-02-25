@@ -12,7 +12,6 @@ import { Progress } from '@/components/ui/progress';
 import { ResponsiveDialog } from '@/components/ui/responsive-dialog';
 import { SubscriptionForm } from '@/components/forms/subscription-form';
 import { TransferSubscriptionForm } from '@/components/forms/transfer-subscription-form';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +22,10 @@ import {
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { cancelSubscriptionAction } from '@/lib/db/actions/subscriptions';
-import { ServerAction } from '@/lib/db/actions/types';
-export function VehicleSubscriptionsCard({ userDetail }: { userDetail: UserDetail; }) {
+import { CSRFormProps, ServerAction } from '@/lib/db/actions/types';
+
+
+export function VehicleSubscriptionsCard({ userDetail, onSuccess }: CSRFormProps) {
   const { subscriptions, vehicles, is_overdue } = userDetail;
   const [ showAddSubscription, setShowAddSubscription ] = useState(false);
   const [ showTransferSubscription, setShowTransferSubscription ] = useState(false);
@@ -66,6 +67,9 @@ export function VehicleSubscriptionsCard({ userDetail }: { userDetail: UserDetai
       toast.success('Subscription cancelled successfully');
       setShowCancelSubscription(false);
       setSelectedSubscription(null);
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       toast.error('Failed to cancel subscription');
       console.error(error);

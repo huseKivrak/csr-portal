@@ -16,9 +16,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { updateUserAction } from '@/lib/db/actions/users';
-import { UserDetail } from '@/db/types';
 import { userFormSchema } from '@/db/validation';
-import { ServerAction } from '@/lib/db/actions/types';
+import { CSRFormProps, ServerAction } from '@/lib/db/actions/types';
 import { useEffect } from 'react';
 import {
   Select,
@@ -33,10 +32,7 @@ type UserFormData = z.infer<typeof userFormSchema>;
 export function UserForm({
   userDetail,
   onSuccess,
-}: {
-  userDetail: UserDetail;
-  onSuccess?: () => void;
-}) {
+}: CSRFormProps) {
   const { name, email, phone, address, id, account_status } = userDetail.user;
 
   const form = useForm<UserFormData>({
