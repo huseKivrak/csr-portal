@@ -19,6 +19,14 @@ import { updateUserAction } from '@/lib/db/actions/users';
 import { UserDetail } from '@/db/types';
 import { userFormSchema } from '@/db/validation';
 import { ServerAction } from '@/lib/db/actions/types';
+import { useEffect } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type UserFormData = z.infer<typeof userFormSchema>;
 
@@ -29,16 +37,24 @@ export function UserForm({
   userDetail: UserDetail;
   onSuccess?: () => void;
 }) {
-  const { name, email, phone, id } = userDetail.user;
+  const { name, email, phone, address, id, account_status } = userDetail.user;
+
   const form = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema),
     mode: 'onChange',
     defaultValues: {
-      name,
-      email,
-      phone,
+      name: name || '',
+      email: email || '',
+      phone: phone || '',
+      address: address || '',
+      account_status: account_status || 'active',
     },
   });
+
+  // Force validation on mount
+  useEffect(() => {
+    form.trigger();
+  }, [ form ]);
 
   async function onSubmit(data: UserFormData) {
     try {
@@ -52,22 +68,25 @@ export function UserForm({
         onSuccess && onSuccess();
       } else {
         // Handle validation/server errors
-        Object.entries(result.errors).forEach(([ field, messages ]) => {
-          messages.forEach(message => {
-            toast.error(`${field}: ${message}`);
+        if (result.errors && Object.keys(result.errors).length > 0) {
+          Object.entries(result.errors).forEach(([ field, messages ]) => {
+            messages.forEach(message => {
+              toast.error(`${field}: ${message}`);
+            });
           });
-        });
+        } else {
+          toast.error('Unknown error occurred');
+        }
       }
     } catch (error) {
-      toast.error('Failed to update user');
       console.error('Failed to update user:', error);
+      toast.error('Failed to update user');
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} >
-
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-2">
           <h2 className="text-xl font-semibold">Edit User</h2>
           <FormDescription>
@@ -89,6 +108,7 @@ export function UserForm({
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='email'
@@ -103,6 +123,7 @@ export function UserForm({
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='phone'
@@ -117,6 +138,48 @@ export function UserForm({
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name='address'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Input placeholder='123 Main St' {...field} />
+              </FormControl>
+              <FormDescription>Edit customer&apos;s address</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='account_status'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Account Status</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select account status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>Set the user's account status</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className='flex justify-end'>
           <Button
             type="submit"
@@ -126,8 +189,7 @@ export function UserForm({
             {form.formState.isSubmitting ? "Updating..." : "Update User"}
           </Button>
         </div>
-
-      </form >
-    </Form >
+      </form>
+    </Form>
   );
 }
