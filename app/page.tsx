@@ -1,15 +1,16 @@
-import Link from 'next/link';
-import { generateUsersTableData } from '@/db/queries';
-import { DataTable } from '@/components/ui/data-table/data-table';
-import { columns } from './(csr)/users/columns';
 
+import { generateDetailedUsersData, getDashboardMetrics } from '@/lib/db/actions/queries';
+import DashboardHeader from '@/components/dashboard-header';
 
 
 export default async function Home() {
-  const users = await generateUsersTableData();
+  const usersData = await generateDetailedUsersData();
+  const { subscriptionPlanCount, ...metrics } = await getDashboardMetrics();
+
   return (
-    <div>
-      <DataTable columns={columns} data={users} />
+    <div className="flex flex-col gap-4">
+      <DashboardHeader data={{ ...metrics, usersData, subscriptionPlanCount }} />
     </div>
+
   );
 }
