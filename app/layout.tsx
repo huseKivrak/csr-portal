@@ -40,18 +40,16 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider defaultOpen={defaultOpen}>
-            <div className="min-h-screen flex">
-              <AppSidebar />
-              <div className="flex-1">
-                <Navbar />
-                <div className="container mx-auto p-8 max-w-[1600px]">
-                  <main className="w-full">{children}</main>
-                </div>
+
+          <div className="min-h-screen flex">
+            <div className="flex-1">
+              <Navbar />
+              <div className="container mx-auto p-8">
+                <main className="w-full ">{children}</main>
               </div>
             </div>
-            <Toaster />
-          </SidebarProvider>
+          </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
