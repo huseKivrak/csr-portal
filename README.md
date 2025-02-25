@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AMP Customer Service Dashboard
 
-## Getting Started
+A comprehensive Customer Service Representative (CSR) portal for AMP, a membership and loyalty platform designed for car washes. This application enables CSRs to efficiently manage customer accounts, subscriptions, and resolve customer inquiries.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **User Management**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+  - View a list of all registered users
+  - Search and filter users by various criteria
+  - View detailed user profiles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Account Management**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+  - View and edit customer account information
+  - Manage account details
+  - Quick access to all required forms through searchbar or hotkeys
 
-## Learn More
+- **Subscription Management**
 
-To learn more about Next.js, take a look at the following resources:
+  - View active vehicle subscriptions
+  - Add, remove, or transfer subscriptions
+  - Handle subscription payment issues
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Purchase History**
+  - Track customer transactions
+  - Review purchase details
+  - Resolve billing questions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+### Frontend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js 15**
+- **React 19**
+- **Tailwind CSS**
+- **shadcn/ui**
+- **Tanstack Table**
+- **React Hook Form**
+- **Zod**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Backend
+
+- **Next.js Server Actions**
+- **Drizzle ORM**
+- **PostgreSQL**
+- **Supabase Database**
+
+### Tools & Utilities
+
+- **TypeScript**
+- **ESLint**
+- **Faker.js**
+
+## Usage
+
+### User Access:
+
+- Find a user by name using the autocomplete searchbar
+- Navigate to the users page (`/users`) for a table of all users
+  - Click on a user to view their detailed profile
+
+### User Management:
+
+- From a user's profile, edit their account information or add a note
+- Access quick actions from the user actions searchbar, with optional hotkeys
+  - shift+1 -> shift+5 for instant access to most relevant forms.
+- View and manage subscription details and payment history via the tabbed card layout below the user info card
+
+## Known Issues
+
+- Cancelling user accounts works but shows an immediate 404 on their page.
+  - This is due to tables currently filtering for active users.
+- New or edited CSR notes are sometimes not immediately reflected on user's profile, or do not reflect previous notes.
+- Some layouts are not mobile-friendly.
+- Subscriptions can be transferred to vehicles with active subscriptions (giving them multiple)
+- Theme toggling is buggy on mobile.
+- Incongruent seed data - Data is sufficient for demo but may show conflicting info (purchases/washes may not align with subscription, etc.)
+
+## Future Improvements
+
+- Implement currently unused components:
+  - **Success Card**: animation for form submissions with restart button.
+    - this works well but was not implemented due to time constraints and the addition of the user actions section.
+  - **Subscription Plan Pie Chart**: breakdown of active subscriptions by plan type
+    - Currently the only dynamic visualization and out of place in current layout.
+- Add CSR documentation
+  - Guides, FAQs, more step-by-step directions on forms, etc.
+- Testing
+  - Unit
+  - Integration
+- Error handling
+  - more robust checks in server actions
+  - improve and standardize zod validation schemas
+- Styling
+  - fix colors in dark mode
+  - add appealing background, theme overall
+- Seed Data
+  - fix inconsistencies in seeded data (incongruent purchase/wash history, subscriptions, etc.)
