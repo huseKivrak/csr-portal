@@ -1,5 +1,3 @@
-import { InsertSubscriptionPlan } from '@/db/types';
-
 interface SubscriptionPlan {
 	id: number;
 	name: string;

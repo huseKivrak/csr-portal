@@ -144,12 +144,12 @@ export const transferSubscriptionAction = async (
 				})
 				.returning();
 
-			return [transfer];
+			return [transfer, newSubscription];
 		});
 
 		result = {
 			success: true,
-			data: transfer,
+			data: [transfer],
 		};
 	} catch (error) {
 		console.error('Subscription transfer failed:', error);

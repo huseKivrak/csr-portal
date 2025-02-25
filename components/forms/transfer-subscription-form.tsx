@@ -73,7 +73,9 @@ export function TransferSubscriptionForm({
       if (result.success) {
         toast.success("Subscription transferred successfully");
         form.reset();
-        onSuccess && onSuccess();
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         Object.entries(result.errors).forEach(([ field, messages ]) => {
           messages.forEach(message => {

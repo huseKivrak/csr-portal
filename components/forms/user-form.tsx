@@ -65,7 +65,9 @@ export function UserForm({
 
       if (result.success) {
         toast.success('User updated successfully');
-        onSuccess && onSuccess();
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         // Handle validation/server errors
         if (result.errors && Object.keys(result.errors).length > 0) {

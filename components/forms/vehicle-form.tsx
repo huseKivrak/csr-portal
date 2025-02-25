@@ -69,7 +69,9 @@ export function VehicleForm({
         form.reset();
 
         //callback if form is in dialog
-        onSuccess && onSuccess();
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         // Handle validation/server errors
         Object.entries(result.errors).forEach(([ field, messages ]) => {
