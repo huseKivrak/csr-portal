@@ -44,18 +44,20 @@ export default function DashboardHeader({ data }: DashboardHeader) {
       <div className="bg-card rounded-lg p-4 mb-6 border shadow-sm">
         <h1 className="text-4xl font-bold tracking-widest font-mono my-2">AMP Customer Service Dashboard</h1>
         <Separator className='my-4' />
-        <h2 className="text-2xl font-bold tracking-widest text-muted-foreground max-w-4xl my-2">
+        <h2 className="text-2xl font-bold tracking-widest text-foreground/80 max-w-4xl my-2">
           Welcome back, CSR!
-          <br />
-          Search for a user below to get started.
         </h2>
+        <p className='text-xl my-4 text-muted-foreground'>
+          Search for a user to get started.
+        </p>
         <div className="flex flex-col gap-3 mb-4">
           <UsersAutocomplete users={users} />
           <Button
             onClick={() => router.push('/users')}
             variant="secondary"
+            className='text-xl tracking-widest font-semibold'
           >
-            View all Users
+            View All Users
             <ExternalLink className="w-4 h-4 ml-2" />
           </Button>
         </div>
