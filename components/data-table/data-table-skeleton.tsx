@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function DataTableSkeleton() {
+export function DataTableSkeleton() {
   return (
     <div className="w-full max-w-screen-lg mx-auto px-4 py-8">
       <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
