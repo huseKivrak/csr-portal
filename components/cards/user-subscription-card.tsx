@@ -1,6 +1,6 @@
 import { Circle } from "lucide-react";
 import { UserDetail } from "@/db/types";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { makeVehicleTitle } from "@/lib/utils";
 
 interface UserSubscriptionCardProps {
