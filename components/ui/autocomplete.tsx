@@ -117,8 +117,8 @@ export const AutoComplete = ({
       </div>
       <div className="relative mt-1">
         {isOpen && (options.length > 0 || isLoading) ? (
-          <div className="absolute top-0 z-10 w-full rounded-xl outline-none animate-in fade-in-0 zoom-in-95">
-            <CommandList className="rounded-lg ring-1 ring-slate-200">
+          <div className="absolute top-0 z-50 w-full rounded-xl outline-none animate-in fade-in-0 zoom-in-95">
+            <CommandList className="rounded-lg ring-1 ring-slate-200 bg-popover">
               {isLoading ? (
                 <CommandPrimitive.Loading>
                   <div className="p-1">
