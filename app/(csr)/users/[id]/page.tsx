@@ -7,8 +7,9 @@ export default async function UserPage({
 }: {
   params: { id: string; };
 }) {
+  const { id } = params;
   const users = await generateDetailedUsersData();
-  const userDetail = users.find((user) => user.user.id === parseInt(params.id));
+  const userDetail = users.find((user) => user.user.id === parseInt(id));
 
   if (!userDetail) {
     notFound();
