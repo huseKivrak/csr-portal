@@ -13,6 +13,7 @@ import { CopyButton } from '@/components/copy-button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { UserActionsSection } from '../action-search/user-actions-section';
+import { CSRNoteForm } from '@/components/forms/csr-user-note-form';
 
 export function UserInfoCard({ userDetail }: { userDetail: UserDetail; }) {
   const { is_overdue } = userDetail;
@@ -150,6 +151,8 @@ export function UserInfoCard({ userDetail }: { userDetail: UserDetail; }) {
                 </AlertDescription>
               </Alert>
             )}
+
+            <CSRNoteForm userDetail={userDetail} />
           </CardContent>
         </div>
 
