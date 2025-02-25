@@ -237,7 +237,7 @@ export function VehicleSubscriptionsCard({ userDetail }: { userDetail: UserDetai
               <Car className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
               <h3 className="mt-4 text-lg font-medium">No Active Subscriptions</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                This customer doesn't have any active vehicle subscriptions.
+                This customer doesn&apos;t have any active vehicle subscriptions.
               </p>
               <Button
                 onClick={() => setShowAddSubscription(true)}

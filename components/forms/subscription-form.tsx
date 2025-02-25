@@ -29,7 +29,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { UserDetail, SelectPaymentMethod } from "@/db/types";
+import { UserDetail } from "@/db/types";
 import { subscriptionFormSchema } from "@/db/validation";
 import { cn, makeVehicleTitle } from '@/lib/utils';
 import { SUBSCRIPTION_PLANS } from '@/lib/db/constants';

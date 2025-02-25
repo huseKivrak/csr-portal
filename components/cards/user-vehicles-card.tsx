@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { SelectUser, UserDetail } from '@/db/types';
+import { UserDetail } from '@/db/types';
 import { Badge } from '@/components/ui/badge';
 import { SUBSCRIPTION_PLANS } from '@/lib/db/constants';
 
@@ -8,7 +8,7 @@ import { SUBSCRIPTION_PLANS } from '@/lib/db/constants';
 
 
 export function UserVehiclesCard({ userDetail }: { userDetail: UserDetail; }) {
-  const { user, vehicles, subscriptions } = userDetail;
+  const { vehicles, subscriptions } = userDetail;
 
   const vehicleSubscription = (vehicleId: number) => {
     return subscriptions.find((subscription) => subscription.vehicle_id === vehicleId);

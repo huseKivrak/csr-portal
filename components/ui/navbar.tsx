@@ -1,6 +1,5 @@
 'use client';
 
-import { ModeToggle } from '@/components/ui/mode-toggle';
 import { Breadcrumbs } from '@/components/ui/app-breadcrumbs';
 
 export function Navbar() {
