@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from 'zod';
@@ -37,8 +37,6 @@ import { UserDetail } from "@/db/types";
 import { transferSubscriptionAction } from "@/lib/db/actions/subscriptions";
 import { ServerAction } from '@/lib/db/actions/types';
 
-
-
 type TransferFormData = z.infer<typeof subscriptionTransferFormSchema>;
 
 interface SubscriptionTransferFormProps {
@@ -46,13 +44,14 @@ interface SubscriptionTransferFormProps {
   onSuccess?: () => void;
 }
 
-
-
 export function TransferSubscriptionForm({
   userDetail,
   onSuccess
 }: SubscriptionTransferFormProps) {
   const activeSubscriptions = userDetail.subscriptions.filter(sub => sub.status === 'active');
+
+  const [ subscriptionPopoverOpen, setSubscriptionPopoverOpen ] = useState(false);
+  const [ vehiclePopoverOpen, setVehiclePopoverOpen ] = useState(false);
 
   const form = useForm<TransferFormData>({
     resolver: zodResolver(subscriptionTransferFormSchema),
@@ -88,7 +87,6 @@ export function TransferSubscriptionForm({
     }
   }
 
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} >
@@ -105,7 +103,7 @@ export function TransferSubscriptionForm({
           render={({ field }) => (
             <FormItem className="space-y-2">
               <FormLabel>Active Subscription</FormLabel>
-              <Popover>
+              <Popover open={subscriptionPopoverOpen} onOpenChange={setSubscriptionPopoverOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -144,6 +142,7 @@ export function TransferSubscriptionForm({
                               onSelect={() => {
                                 form.setValue("subscription_id", sub.id);
                                 form.setValue("from_vehicle_id", sub.vehicle_id);
+                                setSubscriptionPopoverOpen(false);
                               }}
                             >
                               {vehicle && makeVehicleTitle(vehicle)}
@@ -172,7 +171,7 @@ export function TransferSubscriptionForm({
           render={({ field }) => (
             <FormItem className="space-y-2">
               <FormLabel>Transfer To Vehicle</FormLabel>
-              <Popover>
+              <Popover open={vehiclePopoverOpen} onOpenChange={setVehiclePopoverOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -202,7 +201,10 @@ export function TransferSubscriptionForm({
                             <CommandItem
                               key={vehicle.id}
                               value={vehicle.id.toString()}
-                              onSelect={() => form.setValue("to_vehicle_id", vehicle.id)}
+                              onSelect={() => {
+                                form.setValue("to_vehicle_id", vehicle.id);
+                                setVehiclePopoverOpen(false);
+                              }}
                             >
                               {makeVehicleTitle(vehicle)}
                               <Check
